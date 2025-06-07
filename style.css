@@ -91,7 +91,7 @@ button {
         inset 0 0 10px #ff0000;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 700px) {
     .item {
         font-size: 15px;
         width: 50px;
