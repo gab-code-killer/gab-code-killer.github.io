@@ -1,0 +1,187 @@
+.titre {
+    text-align: center;
+    margin-top: 35px;
+}
+
+.vrai_titre {
+    border: solid #ff4646 4px;
+    box-shadow:
+        0 0 2.5px #ff0000,
+        inset 0 0 2.5px #ff0000,
+        0 0 5px #ff0000,
+        inset 0 0 10px #ff0000,
+        0 0 10px #ff0000,
+        inset 0 0 10px #ff0000;
+}
+
+h1 {
+    display: inline;
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    border-radius: 30px;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: black;
+}
+
+.centre_deux {
+    display: flex;
+    justify-content: center;
+}
+
+.text {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 20px;
+    font-size: 60px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 519px;
+    height: 75px;
+    background-color: white;
+    margin-top: 200px;
+    border-radius: 10px;
+    border: solid #ff4646 4px;
+    box-shadow:
+        0 0 2.5px #ff0000,
+        inset 0 0 2.5px #ff0000,
+        0 0 5px #ff0000,
+        inset 0 0 10px #ff0000,
+        0 0 10px #ff0000,
+        inset 0 0 10px #ff0000;
+}
+
+.container {
+    display: grid;
+    gap: 5px;
+    width: fit-content;
+    grid-template-areas:
+        "MC MR Mmoins Mplus divise"
+        "pourcent sept huit neuf fois"
+        "plus_moins quatre cinq six moins"
+        "racine_carre un deux trois plus"
+        "C zero point egale plus";
+}
+
+.centre {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+button {
+    background-color:rgb(240, 240, 240) ;
+}
+.item {
+    font-size: 30px;
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    border: solid #ff4646 4px;
+    box-shadow:
+        0 0 2.5px #ff0000,
+        inset 0 0 2.5px #ff0000,
+        0 0 5px #ff0000,
+        inset 0 0 5px #ff0000,
+        0 0 10px #ff0000,
+        inset 0 0 10px #ff0000;
+}
+
+.un {
+    grid-area: un;
+}
+
+.deux {
+    grid-area: deux;
+}
+
+.trois {
+    grid-area: trois;
+}
+
+.quatre {
+    grid-area: quatre;
+}
+
+.cinq {
+    grid-area: cinq;
+}
+
+.six {
+    grid-area: six;
+}
+
+.sept {
+    grid-area: sept;
+}
+
+.huit {
+    grid-area: huit;
+}
+
+.neuf {
+    grid-area: neuf;
+}
+
+.zero {
+    grid-area: zero;
+}
+
+.point {
+    grid-area: point;
+}
+
+.egale {
+    grid-area: egale;
+}
+
+.plus {
+    grid-area: plus;
+    height: 206px;
+}
+
+.moins {
+    grid-area: moins;
+}
+
+.fois {
+    grid-area: fois;
+}
+
+.divise {
+    grid-area: divise;
+}
+
+.Mplus {
+    grid-area: Mplus;
+}
+
+.Mmoins {
+    grid-area: Mmoins;
+}
+
+.MR {
+    grid-area: MR;
+}
+
+.MC {
+    grid-area: MC;
+}
+
+.pourcent {
+    grid-area: pourcent;
+}
+
+.plus_moins {
+    grid-area: plus_moins;
+}
+
+.racine_carre {
+    grid-area: racine_carre;
+}
+
+.C {
+    grid-area: C;
+}
