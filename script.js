@@ -16,8 +16,9 @@ const boutonPlus = document.getElementById("boutonPlus");
 const boutonMoins = document.getElementById("boutonMoins");
 const boutonFois = document.getElementById("boutonFois");
 const boutonDivise = document.getElementById("boutonDivise");
+const boutonEgale = document.getElementById("boutonEgale");
 
-boutonUn.addEventListener("click", function () {
+boutonUn.addEventListener("click", function un() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "1";
     }
@@ -25,7 +26,7 @@ boutonUn.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonDeux.addEventListener("click", function () {
+boutonDeux.addEventListener("click", function deux() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "2";
     }
@@ -33,7 +34,7 @@ boutonDeux.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonTrois.addEventListener("click", function () {
+boutonTrois.addEventListener("click", function trois() {
 
     if (divText.innerText.length <= 13) {
         divText.innerText += "3";
@@ -42,7 +43,7 @@ boutonTrois.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonQuatre.addEventListener("click", function () {
+boutonQuatre.addEventListener("click", function quatre() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "4";
     }
@@ -50,7 +51,7 @@ boutonQuatre.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonCinq.addEventListener("click", function () {
+boutonCinq.addEventListener("click", function cinq() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "5";
     }
@@ -58,7 +59,7 @@ boutonCinq.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonSix.addEventListener("click", function () {
+boutonSix.addEventListener("click", function six() {
 
     if (divText.innerText.length <= 13) {
         divText.innerText += "6";
@@ -67,7 +68,7 @@ boutonSix.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonSept.addEventListener("click", function () {
+boutonSept.addEventListener("click", function sept() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "7";
     }
@@ -75,7 +76,7 @@ boutonSept.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonHuit.addEventListener("click", function () {
+boutonHuit.addEventListener("click", function huit() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "8";
     }
@@ -83,7 +84,7 @@ boutonHuit.addEventListener("click", function () {
         divText.innerText -= "0";
     }
 });
-boutonNeuf.addEventListener("click", function () {
+boutonNeuf.addEventListener("click", function neuf() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "9";
     }
@@ -92,22 +93,31 @@ boutonNeuf.addEventListener("click", function () {
     }
 
 });
-boutonZero.addEventListener("click", function () {
+boutonZero.addEventListener("click", function zero() {
     if (divText.innerText.length <= 13) {
         divText.innerText += "0";
     }
 });
-boutonC.addEventListener("click", function () {
+boutonC.addEventListener("click", function C() {
     divText.innerText = "";
 });
-boutonPoint.addEventListener("click", function () {
+boutonPoint.addEventListener("click", function point() {
     if (divText.innerText.length <= 13 && divText.innerText.length > 0 && divText.innerText.includes(".") === false) {
         divText.innerText += ".";
     }
 });
-boutonPlus.addEventListener("click", function () {
-    if (divText.innerText.length <= 13 && divText.innerText.length > 0) {
+boutonPlus.addEventListener("click", function plus() {
+    if (divText.innerText.length <= 13 && divText.innerText.length > 0 && divText.innerText.includes("+") === false) {
         divText.innerText += "+";
     }
 
 });
+boutonEgale.addEventListener("click", function egale() {
+    if (divText.innerText.length <= 13 && divText.innerText.length > 0) {
+
+    }
+
+});
+function additionneNombre() {
+
+}
