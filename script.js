@@ -1,3 +1,5 @@
+
+
 const boutonUn = document.getElementById("boutonUn");
 const divText = document.getElementById("divText");
 const boutonDeux = document.getElementById("boutonDeux");
@@ -166,14 +168,19 @@ boutonC.addEventListener("click", function C() {
 boutonPoint.addEventListener("click", function point() {
   if (
     divText.innerText.length <= 13 &&
-    divText.innerText.length > 0 &&
-    divText.innerText.includes(".") === false
+    divText.innerText.length > 0
   ) {
-    divText.innerText += ".";
-    if (isCalcule === false) {
+    if (isCalcule === false && nombre1.includes(".") === false) {
+      divText.innerText += ".";
+    }
+    if (isCalcule === true && nombre2 > 0 && nombre2.includes(".") === false) {
+      divText.innerText += ".";
+    }
+
+    if (isCalcule === false && nombre1.includes(".") === false) {
       nombre1 += ".";
     }
-    if (isCalcule === true) {
+    if (isCalcule === true && nombre2 > 0 && nombre2.includes(".") === false) {
       nombre2 += ".";
     }
   }
@@ -188,11 +195,32 @@ boutonPlus.addEventListener("click", function plus() {
     isCalcule = true;
   }
 });
+boutonMoins.addEventListener("click", function plus() {
+  if (
+    divText.innerText.length <= 13 &&
+    divText.innerText.length > 0 &&
+    divText.innerText.includes("-") === false
+  ) {
+    divText.innerText += "-";
+    isCalcule = true;
+  }
+});
 boutonEgale.addEventListener("click", function egale() {
+  if (divText.innerText.includes("+") === true) {
     divText.innerText = additionneNombre(nombre1, nombre2);
+  }
+  if (divText.innerText.includes("-") === true) {
+    divText.innerText = soustraitNombre(nombre1, nombre2)
+  }
 });
 function additionneNombre(nombreUn, nombreDeux) {
-console.log(nombre1)
-return parseInt(nombreUn) + parseInt(nombreDeux);
+  const a = new Decimal(nombreUn);
+  const b = new Decimal(nombreDeux);
+  return a.plus(b).toString();
+}
+function soustraitNombre(nombreUn1, nombreDeux2) {
+  const a = new Decimal(nombreUn1);
+  const b = new Decimal(nombreDeux2);
+  return a.minus(b).toString();
 }
 
