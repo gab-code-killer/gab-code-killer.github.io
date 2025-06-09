@@ -205,6 +205,26 @@ boutonMoins.addEventListener("click", function plus() {
     isCalcule = true;
   }
 });
+boutonFois.addEventListener("click", function plus() {
+  if (
+    divText.innerText.length <= 13 &&
+    divText.innerText.length > 0 &&
+    divText.innerText.includes("×") === false
+  ) {
+    divText.innerText += "×";
+    isCalcule = true;
+  }
+});
+boutonDivise.addEventListener("click", function plus() {
+  if (
+    divText.innerText.length <= 13 &&
+    divText.innerText.length > 0 &&
+    divText.innerText.includes("÷") === false
+  ) {
+    divText.innerText += "÷";
+    isCalcule = true;
+  }
+  });
 boutonEgale.addEventListener("click", function egale() {
   if (divText.innerText.includes("+") === true) {
     divText.innerText = additionneNombre(nombre1, nombre2);
@@ -212,6 +232,10 @@ boutonEgale.addEventListener("click", function egale() {
   if (divText.innerText.includes("-") === true) {
     divText.innerText = soustraitNombre(nombre1, nombre2)
   }
+  if (divText.innerText.includes("×") === true)
+    divText.innerText = multiplieNombre(nombre1, nombre2)
+  if (divText.innerText.includes("÷") === true)
+    divText.innerText = diviseNombre(nombre1, nombre2)
 });
 function additionneNombre(nombreUn, nombreDeux) {
   const a = new Decimal(nombreUn);
@@ -223,4 +247,16 @@ function soustraitNombre(nombreUn1, nombreDeux2) {
   const b = new Decimal(nombreDeux2);
   return a.minus(b).toString();
 }
+function multiplieNombre(nombreUn, nombreDeux) {
+  const a = new Decimal(nombreUn);
+  const b = new Decimal(nombreDeux);
+  return a.times(b).toString();
+}
+function diviseNombre(nombreUn, nombreDeux) {
+  const a = new Decimal(nombreUn);
+  const b = new Decimal(nombreDeux);
+  return a.dividedBy(b).toString();
+}
+
+
 
