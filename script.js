@@ -246,12 +246,13 @@ boutonEgale.addEventListener("click", function egale() {
   }
   if (divText.innerText.includes("×") === true) {
     divText.innerText = multiplieNombre(nombre1, nombre2)
+    console.log(divText.innerText.length)
+      if (divText.innerText.length >= 12) {
+    divText.innerText += "e";
+  }
   }
   if (divText.innerText.includes("÷") === true) {
     divText.innerText = diviseNombre(nombre1, nombre2)
-  }
-  if (divText.innerText > 12) {
-    divText.innerText += "e";
   }
 });
 function additionneNombre(nombreUn, nombreDeux) {
