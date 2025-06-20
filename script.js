@@ -18,12 +18,12 @@ const boutonMoins = document.getElementById("boutonMoins");
 const boutonFois = document.getElementById("boutonFois");
 const boutonDivise = document.getElementById("boutonDivise");
 const boutonEgale = document.getElementById("boutonEgale");
+const boutonPlusMoins = document.getElementById("boutonPlusMoins");
 let nombre1 = "";
 let nombre2 = "";
 let isCalcule = false;
-
 boutonUn.addEventListener("click", function un() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "1";
     if (isCalcule === false) {
       nombre1 += "1";
@@ -37,7 +37,7 @@ boutonUn.addEventListener("click", function un() {
   }
 });
 boutonDeux.addEventListener("click", function deux() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "2";
     if (isCalcule === false) {
       nombre1 += "2";
@@ -51,7 +51,7 @@ boutonDeux.addEventListener("click", function deux() {
   }
 });
 boutonTrois.addEventListener("click", function trois() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "3";
     if (isCalcule === false) {
       nombre1 += "3";
@@ -65,7 +65,7 @@ boutonTrois.addEventListener("click", function trois() {
   }
 });
 boutonQuatre.addEventListener("click", function quatre() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "4";
     if (isCalcule === false) {
       nombre1 += "4";
@@ -79,7 +79,7 @@ boutonQuatre.addEventListener("click", function quatre() {
   }
 });
 boutonCinq.addEventListener("click", function cinq() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "5";
     if (isCalcule === false) {
       nombre1 += "5";
@@ -93,7 +93,7 @@ boutonCinq.addEventListener("click", function cinq() {
   }
 });
 boutonSix.addEventListener("click", function six() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "6";
     if (isCalcule === false) {
       nombre1 += "6";
@@ -107,7 +107,7 @@ boutonSix.addEventListener("click", function six() {
   }
 });
 boutonSept.addEventListener("click", function sept() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "7";
     if (isCalcule === false) {
       nombre1 += "7";
@@ -121,7 +121,7 @@ boutonSept.addEventListener("click", function sept() {
   }
 });
 boutonHuit.addEventListener("click", function huit() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "8";
     if (isCalcule === false) {
       nombre1 += "8";
@@ -135,7 +135,7 @@ boutonHuit.addEventListener("click", function huit() {
   }
 });
 boutonNeuf.addEventListener("click", function neuf() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "9";
     if (isCalcule === false) {
       nombre1 += "9";
@@ -149,7 +149,7 @@ boutonNeuf.addEventListener("click", function neuf() {
   }
 });
 boutonZero.addEventListener("click", function zero() {
-  if (divText.innerText.length <= 13) {
+  if (divText.innerText.length <= 12) {
     divText.innerText += "0";
     if (isCalcule === false) {
       nombre1 += "0";
@@ -159,6 +159,18 @@ boutonZero.addEventListener("click", function zero() {
     }
   }
 });
+/* boutonPlusMoins.addEventListener("click", function PlusMoins() {
+  if (divText.innerText.length <= 12 && divText.innerText.startsWith("-") === false) {
+    console.log("h")
+    divText.innerText = "-" + divText.innerText;
+    if (isCalcule === false) {
+      nombre1 += "-";
+    }
+    if (isCalcule === true) {
+      nombre2 += "-";
+    }
+  }
+}); */
 boutonC.addEventListener("click", function C() {
   divText.innerText = "";
   nombre1 = "";
@@ -167,7 +179,7 @@ boutonC.addEventListener("click", function C() {
 });
 boutonPoint.addEventListener("click", function point() {
   if (
-    divText.innerText.length <= 13 &&
+    divText.innerText.length <= 12 &&
     divText.innerText.length > 0
   ) {
     if (isCalcule === false && nombre1.includes(".") === false) {
@@ -187,7 +199,7 @@ boutonPoint.addEventListener("click", function point() {
 });
 boutonPlus.addEventListener("click", function plus() {
   if (
-    divText.innerText.length <= 13 &&
+    divText.innerText.length <= 12 &&
     divText.innerText.length > 0 &&
     divText.innerText.includes("+") === false
   ) {
@@ -195,9 +207,9 @@ boutonPlus.addEventListener("click", function plus() {
     isCalcule = true;
   }
 });
-boutonMoins.addEventListener("click", function plus() {
+boutonMoins.addEventListener("click", function moins() {
   if (
-    divText.innerText.length <= 13 &&
+    divText.innerText.length <= 12 &&
     divText.innerText.length > 0 &&
     divText.innerText.includes("-") === false
   ) {
@@ -205,9 +217,9 @@ boutonMoins.addEventListener("click", function plus() {
     isCalcule = true;
   }
 });
-boutonFois.addEventListener("click", function plus() {
+boutonFois.addEventListener("click", function fois() {
   if (
-    divText.innerText.length <= 13 &&
+    divText.innerText.length <= 12 &&
     divText.innerText.length > 0 &&
     divText.innerText.includes("×") === false
   ) {
@@ -215,16 +227,16 @@ boutonFois.addEventListener("click", function plus() {
     isCalcule = true;
   }
 });
-boutonDivise.addEventListener("click", function plus() {
+boutonDivise.addEventListener("click", function divise() {
   if (
-    divText.innerText.length <= 13 &&
+    divText.innerText.length <= 12 &&
     divText.innerText.length > 0 &&
     divText.innerText.includes("÷") === false
   ) {
     divText.innerText += "÷";
     isCalcule = true;
   }
-  });
+});
 boutonEgale.addEventListener("click", function egale() {
   if (divText.innerText.includes("+") === true) {
     divText.innerText = additionneNombre(nombre1, nombre2);
@@ -232,10 +244,15 @@ boutonEgale.addEventListener("click", function egale() {
   if (divText.innerText.includes("-") === true) {
     divText.innerText = soustraitNombre(nombre1, nombre2)
   }
-  if (divText.innerText.includes("×") === true)
+  if (divText.innerText.includes("×") === true) {
     divText.innerText = multiplieNombre(nombre1, nombre2)
-  if (divText.innerText.includes("÷") === true)
+  }
+  if (divText.innerText.includes("÷") === true) {
     divText.innerText = diviseNombre(nombre1, nombre2)
+  }
+  if (divText.innerText > 12) {
+    divText.innerText += "e";
+  }
 });
 function additionneNombre(nombreUn, nombreDeux) {
   const a = new Decimal(nombreUn);
