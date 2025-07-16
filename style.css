@@ -40,7 +40,7 @@ body {
     font-weight: bold;
     font-family: Arial, sans-serif;
     width: 493px;
-    height: 75px;
+    height: 80px;
     background-color: rgb(240, 240, 240);
     margin-top: 200px;
     border-radius: 10px;
@@ -94,19 +94,19 @@ button {
 @media screen and (max-width: 700px) {
     .item {
         font-size: 20px;
-        width: 75px;
-        height: 75px;
+        width: 65px;
+        height: 65px;
     }
 
     .plus {
-        height: 155px !important;
+        height: 135px !important;
     }
 
     .text {
-        padding-right: 10px;
+        padding-right: 7px;
         font-size: 30px;
-        width: 377px;
-        height: 50px;
+        width: 333px;
+        height: 47px;
     }
 
     h1 {
