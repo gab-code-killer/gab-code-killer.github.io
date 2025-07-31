@@ -34,9 +34,9 @@ body {
 .text {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
     padding-right: 20px;
-    font-size: 60px;
+    font-size: 55px;
     font-weight: bold;
     font-family: Arial, sans-serif;
     width: 493px;

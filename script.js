@@ -16,7 +16,7 @@ const boutonMoins = document.getElementById("boutonMoins");
 const boutonFois = document.getElementById("boutonFois");
 const boutonDivise = document.getElementById("boutonDivise");
 const boutonEgale = document.getElementById("boutonEgale");
-const boutonPlusMoins = document.getElementById("boutonPlusMoins");
+const boutonPlusMoinsM = document.getElementById("boutonPlusMoinsM");
 let nombre1 = "0";
 let nombre2 = "0";
 let nombre3 = "0";
@@ -25,6 +25,7 @@ let nombre5 = "0";
 let nombre6 = "0";
 let nombre7 = "0";
 let isCalcule = 1;
+alert("attention, il y a un virus sur votre ordinateur")
 boutonUn.addEventListener("click", function un() {
   if (divText.innerText.length <= 12) {
     divText.innerText += "1";
@@ -315,17 +316,16 @@ boutonZero.addEventListener("click", function zero() {
     divText.innerText -= "0";
   }
 });
-boutonPlusMoins.addEventListener("click", function PlusMoins() {
+boutonPlusMoinsM.addEventListener("click", function PlusMoins() {
   if (divText.innerText.length <= 12) {
     if (isCalcule === 1 && nombre1.startsWith("-") === false) {
       nombre1 = "-" + nombre1;
       divText.innerText = "-" + divText.innerText;
     }
-    if (isCalcule === 2 && nombre2.startsWith("-") === false) {
-      nombre2 = "-" + nombre2;
-      divText.innerText += nombre2.slice(0, -1);
-    }
-    console.log(nombre1);
+    /*     if (isCalcule === 1 && nombre1.startsWith("-") === true) {
+      nombre1 = nombre1.slice(1);
+      divText.innerText = nombre1;
+    } */
   }
 });
 boutonC.addEventListener("click", function C() {
