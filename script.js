@@ -25,7 +25,7 @@ let nombre5 = "0";
 let nombre6 = "0";
 let nombre7 = "0";
 let isCalcule = 1;
-alert("attention, il y a un virus sur votre ordinateur")
+alert("attention, il y a un virus sur votre téléphone")
 boutonUn.addEventListener("click", function un() {
   if (divText.innerText.length <= 12) {
     divText.innerText += "1";
