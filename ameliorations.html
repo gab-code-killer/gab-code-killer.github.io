@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Améliorations</title>
+    <link rel="stylesheet" href="ameliorations.css" />
+  </head>
+  <body>
+    <h1>🛒 Boutique d'Améliorations</h1>
+    <h2 id="pseudoAffiche">Bienvenue !</h2>
+    <h2 id="scoreAffiche">Vos points: 0</h2>
+
+    <div class="amelioration-container">
+      <div class="amelioration-item">
+        <h3>⚡ Clic Puissant</h3>
+        <p>Augmente tes points par clic de +1</p>
+        <p id="infoNiveau">Niveau actuel: <span id="niveauActuel">1</span> (+<span id="pointsParClic">1</span> points par clic)</p>
+        <p id="prixAffiche" class="prix">Prix: <span id="prixActuel">10</span> points</p>
+        <button id="boutonAcheter" class="bouton-achat">Améliorer</button>
+      </div>
+    </div>
+
+    <button id="retourJeu" class="retour">Retour au Jeu</button>
+
+    <script src="ameliorations.js"></script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+body {
+    text-align: center;
+}
+
+form {
+    margin-top: 100px;
+}
+
+.champ {
+    margin-bottom: 20px;
+}
+
+.p_pseudo,
+.p_email,
+.p_mot_de_passe {
+    margin: 0;
+    color: red;
+    font-size: 14px;
+}
+
+.pseudo,
+.email,
+.mot_de_passe {
+    width: 200px;
+    height: 25px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+.soumettre {
+    border: none;
+    height: 30px;
+    border-radius: 10px;
+    background-color: rgb(255, 219, 255);
+    cursor: pointer;
+    transition: 0.3s;
+    padding: 0 15px;
+}
+
+.soumettre:hover {
+    background-color: rgb(255, 204, 255);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

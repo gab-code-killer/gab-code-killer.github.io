@@ -1,0 +1,84 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.jeu {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    font-size: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin: 20px;
+    transition: 0.3s;
+}
+
+#boutonJeu:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+}
+
+.affiche {
+    font-size: 30px;
+    color: #333;
+}
+
+.Connexion {
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin: 20px;
+    transition: 0.3s;
+}
+
+.deconnexion {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 120px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 14px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.Connexion:hover {
+    background-color: #1976D2;
+    transform: scale(1.05);
+}
+
+.deconnexion:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+.ameliorations {
+    width: 150px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #FF9800;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin: 20px auto;
+    display: block;
+    transition: 0.3s;
+}
+
+.ameliorations:hover {
+    background-color: #F57C00;
+    transform: scale(1.05);
+}

@@ -1,0 +1,20 @@
+body {
+    text-align: center;
+}
+
+.creer,
+.connection {
+    width: 200px;
+    height: 25px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.creer {
+    background-color: #3B82F6;
+}
+
+.connection {
+    background-color: #1E40AF;
+}
