@@ -6,21 +6,29 @@ const pMotDePasse = document.getElementById("pMotDePasse");
 
 buttonSoumettre.addEventListener("click", function (event) {
   event.preventDefault();
-  if (this.checkValidity() && inputMotDePasse.value !== "") {
-    const compteStocke = localStorage.getItem(inputEmail.value);
-
-    if (compteStocke) {
-      const compte = JSON.parse(compteStocke);
-      if (compte.motDePasse === inputMotDePasse.value) {
-        localStorage.setItem("utilisateurConnecte", inputEmail.value);
-        alert("Connexion réussie !");
+  if (inputEmail.checkValidity() && inputMotDePasse.value !== "") {
+    // Connexion avec Firebase
+    auth.signInWithEmailAndPassword(inputEmail.value, inputMotDePasse.value)
+      .then((userCredential) => {
+        // Connexion réussie
+        const user = userCredential.user;
+        console.log("✅ Connexion réussie :", user.email);
+        alert("Connexion réussie ! Bienvenue dans le jeu !");
         window.location.href = "index.html";
-      } else {
-        alert("Mot de passe incorrect !");
-      }
-    } else {
-      alert("Ce compte n'existe pas !");
-    }
+      })
+      .catch((error) => {
+        console.error("❌ Erreur connexion:", error.message);
+        if (error.code === 'auth/user-not-found') {
+          inputEmail.style.backgroundColor = "#ff5656ff";
+          pEmail.textContent = "Ce compte n'existe pas !";
+        } else if (error.code === 'auth/wrong-password') {
+          inputMotDePasse.style.backgroundColor = "#ff5656ff";
+          pMotDePasse.textContent = "Mot de passe incorrect !";
+        } else if (error.code === 'auth/invalid-email') {
+          inputEmail.style.backgroundColor = "#ff5656ff";
+          pEmail.textContent = "Email invalide !";
+        }
+      });
   } else if (inputEmail.value === "" && inputMotDePasse.value === "") {
     inputEmail.style.backgroundColor = "#ff5656ff";
     inputMotDePasse.style.backgroundColor = "#ff5656ff";

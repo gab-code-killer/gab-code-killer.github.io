@@ -8,6 +8,40 @@ const boutonDeconnexion = document.getElementById("boutonDeconnexion");
 let utilisateurActuel = null;
 let donneesUtilisateur = null;
 
+// Fonction pour masquer l'écran de chargement et afficher le contenu
+function afficherContenu() {
+  const ecranChargement = document.getElementById("chargement");
+  const contenuPrincipal = document.getElementById("contenu-principal");
+  
+  setTimeout(() => {
+    ecranChargement.classList.add("fade-out");
+    setTimeout(() => {
+      ecranChargement.style.display = "none";
+      contenuPrincipal.classList.remove("contenu-cache");
+      contenuPrincipal.classList.add("contenu-visible");
+    }, 500);
+  }, 1500); // Attendre 1.5 secondes pour montrer le chargement
+}
+
+// Fonction pour redirection douce vers accueil
+function redirigerVersAccueil() {
+  const ecranChargement = document.getElementById("chargement");
+  const titre = ecranChargement.querySelector("h2");
+  const texte = ecranChargement.querySelector("p");
+  
+  setTimeout(() => {
+    titre.textContent = "🔐 Redirection...";
+    texte.textContent = "Vous devez vous connecter pour jouer !";
+    
+    setTimeout(() => {
+      ecranChargement.classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = "accueil.html";
+      }, 500);
+    }, 1000);
+  }, 1500);
+}
+
 // Vérifier si l'utilisateur est connecté
 auth.onAuthStateChanged((user) => {
   if (user) {
@@ -23,12 +57,16 @@ auth.onAuthStateChanged((user) => {
           pseudoAffiche.textContent = `Salut ${donneesUtilisateur.pseudo} !`;
           scoreAffiche.textContent = `Score: ${donneesUtilisateur.score || 0}`;
           afficherClassement();
+          // Afficher le contenu avec une belle transition
+          afficherContenu();
         }
       });
   } else {
-    // Pas d'utilisateur connecté, rediriger vers connexion
+    // Pas d'utilisateur connecté
     console.log("❌ Pas d'utilisateur connecté");
-    window.location.href = "connexion.html";
+    
+    // Redirection douce vers accueil
+    redirigerVersAccueil();
   }
 });
 

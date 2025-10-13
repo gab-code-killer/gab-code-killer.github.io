@@ -82,3 +82,62 @@ body {
     background-color: #F57C00;
     transform: scale(1.05);
 }
+
+/* Styles pour l'écran de chargement */
+.ecran-chargement {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: Arial, sans-serif;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.ecran-chargement.fade-out {
+    opacity: 0;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-left: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ecran-chargement h2 {
+    font-size: 2em;
+    margin: 10px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.ecran-chargement p {
+    font-size: 1.2em;
+    opacity: 0.8;
+}
+
+/* Contenu principal caché au début */
+.contenu-cache {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.contenu-visible {
+    opacity: 1;
+}
