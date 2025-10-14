@@ -137,35 +137,45 @@ function genererJoueursFictifs() {
   
   const joueursFictifs = [];
   
-  // Générer entre 500 et 1000 joueurs fictifs
-  const nombreJoueurs = Math.floor(Math.random() * 501) + 500; // Entre 500 et 1000
+  // Générer entre 10 000 et 1 000 000 joueurs fictifs (ÉNORME DÉFI !)
+  const nombreJoueurs = Math.floor(Math.random() * 990001) + 10000; // Entre 10 000 et 1 000 000
+  console.log(`🎮 Génération de ${nombreJoueurs.toLocaleString('fr-FR')} joueurs fictifs...`);
   
+  // Optimisation : génération par batch pour éviter de bloquer l'interface
   for (let i = 0; i < nombreJoueurs; i++) {
+    // Afficher un message de progression tous les 50 000 joueurs
+    if (i % 50000 === 0 && i > 0) {
+      console.log(`⏳ Progression: ${Math.round((i/nombreJoueurs)*100)}% (${i.toLocaleString('fr-FR')}/${nombreJoueurs.toLocaleString('fr-FR')})`);
+    }
     const prenom = prenoms[Math.floor(Math.random() * prenoms.length)];
     const suffixe = suffixes[Math.floor(Math.random() * suffixes.length)];
     const numero = Math.floor(Math.random() * 9999) + 1;
     const pseudo = prenom + suffixe + numero;
     
-    // Générer plus de scores bas (personnes nulles)
+    // Répartition réaliste des scores pour un gros serveur
     let score;
     const random = Math.random();
-    if (random < 0.4) {
-      // 40% de chance d'avoir un score entre 0 et 50 (les nuls)
-      score = Math.floor(Math.random() * 51);
-    } else if (random < 0.6) {
-      // 20% de chance d'avoir un score entre 51 et 200 (débutants)
-      score = Math.floor(Math.random() * 150) + 51;
-    } else if (random < 0.8) {
-      // 20% de chance d'avoir un score entre 201 et 1000 (moyens)
-      score = Math.floor(Math.random() * 800) + 201;
-    } else {
-      // 20% de chance d'avoir un score entre 1001 et 10000 (pros)
+    if (random < 0.5) {
+      // 50% ont un score entre 0 et 100 (les débutants/casual)
+      score = Math.floor(Math.random() * 101);
+    } else if (random < 0.75) {
+      // 25% ont un score entre 101 et 1000 (joueurs réguliers)
+      score = Math.floor(Math.random() * 900) + 101;
+    } else if (random < 0.9) {
+      // 15% ont un score entre 1001 et 10000 (joueurs expérimentés)
       score = Math.floor(Math.random() * 9000) + 1001;
+    } else if (random < 0.98) {
+      // 8% ont un score entre 10001 et 100000 (pros)
+      score = Math.floor(Math.random() * 90000) + 10001;
+    } else {
+      // 2% ont un score entre 100001 et 1000000 (les légendes !)
+      score = Math.floor(Math.random() * 900000) + 100001;
     }
     
     joueursFictifs.push({ pseudo: pseudo, score: score });
   }
   
+  console.log(`✅ Génération terminée ! ${nombreJoueurs.toLocaleString('fr-FR')} joueurs créés.`);
   return joueursFictifs;
 }
 
@@ -186,7 +196,9 @@ function afficherClassement() {
       const tousLesJoueurs = [...joueursFictifs, ...joueursReels];
       tousLesJoueurs.sort((a, b) => b.score - a.score);
       
-      classement.innerHTML = "<h3>Classement :</h3>";
+      // Formater le nombre de joueurs pour l'affichage
+      const nombreTotal = tousLesJoueurs.length.toLocaleString('fr-FR');
+      classement.innerHTML = `<h3>🌍 Classement Global</h3><p style="margin: 5px 0; color: #666; font-size: 13px;">${nombreTotal} joueurs connectés</p>`;
       
       // Trouver la position du joueur connecté
       let positionJoueur = -1;
