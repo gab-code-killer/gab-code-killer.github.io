@@ -1,3 +1,61 @@
+// Fonction pour afficher des notifications automatiques
+function afficherNotification(message, type = 'info', duree = 3000) {
+  // Créer la notification
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  
+  // Styles de base
+  notification.style.position = 'fixed';
+  notification.style.top = '20px';
+  notification.style.right = '20px';
+  notification.style.padding = '15px 20px';
+  notification.style.borderRadius = '8px';
+  notification.style.color = 'white';
+  notification.style.fontWeight = 'bold';
+  notification.style.zIndex = '10000';
+  notification.style.minWidth = '300px';
+  notification.style.textAlign = 'center';
+  notification.style.fontSize = '14px';
+  notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+  notification.style.transform = 'translateX(100%)';
+  notification.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+  
+  // Couleurs selon le type
+  if (type === 'success') {
+    notification.style.backgroundColor = '#4CAF50';
+    notification.style.border = '2px solid #45a049';
+  } else if (type === 'error') {
+    notification.style.backgroundColor = '#f44336';
+    notification.style.border = '2px solid #d32f2f';
+  } else if (type === 'warning') {
+    notification.style.backgroundColor = '#ff9800';
+    notification.style.border = '2px solid #f57c00';
+  } else {
+    notification.style.backgroundColor = '#2196F3';
+    notification.style.border = '2px solid #1976d2';
+  }
+  
+  // Ajouter au DOM
+  document.body.appendChild(notification);
+  
+  // Animation d'entrée
+  setTimeout(() => {
+    notification.style.transform = 'translateX(0)';
+  }, 10);
+  
+  // Animation de sortie et suppression
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    notification.style.opacity = '0';
+    
+    setTimeout(() => {
+      if (notification.parentNode) {
+        document.body.removeChild(notification);
+      }
+    }, 300);
+  }, duree);
+}
+
 // Variables Firebase
 let utilisateurActuel = null;
 let donneesUtilisateur = null;
@@ -85,6 +143,11 @@ function acheterAmelioration() {
   const score = donneesUtilisateur.score || 0;
 
   if (score >= prix) {
+    // Désactiver le bouton pendant l'achat
+    const boutonAcheter = document.getElementById("boutonAcheter");
+    boutonAcheter.disabled = true;
+    boutonAcheter.textContent = "⏳ Achat en cours...";
+    
     // Calculer les nouvelles valeurs
     const nouveauScore = score - prix;
     const nouveauNiveau = niveau + 1;
@@ -96,19 +159,24 @@ function acheterAmelioration() {
       niveauClic: nouveauNiveau,
       pointsParClic: nouveauxPointsParClic
     }).then(() => {
-      // Mettre à jour les données locales
-      donneesUtilisateur.score = nouveauScore;
-      donneesUtilisateur.niveauClic = nouveauNiveau;
-      donneesUtilisateur.pointsParClic = nouveauxPointsParClic;
+      // Amélioration achetée avec succès !
+      afficherNotification(`🎉 Amélioration achetée ! Maintenant tu gagnes ${nouveauxPointsParClic} points par clic !`, 'success', 2000);
       
-      alert(`🎉 Amélioration achetée ! Maintenant tu gagnes ${nouveauxPointsParClic} points par clic !`);
-      mettreAJourAffichage();
+      // Recharger la page pour synchroniser toutes les données
+      setTimeout(() => {
+        window.location.reload();
+      }, 2200); // Laisser le temps de voir la notification
     }).catch((error) => {
       console.error("Erreur lors de l'achat:", error);
-      alert("❌ Erreur lors de l'achat !");
+      afficherNotification("❌ Erreur lors de l'achat !", 'error');
+      
+      // Réactiver le bouton en cas d'erreur
+      const boutonAcheter = document.getElementById("boutonAcheter");
+      boutonAcheter.disabled = false;
+      mettreAJourAffichage(); // Remet le bon texte du bouton
     });
   } else {
-    alert("❌ Pas assez de points !");
+    afficherNotification("❌ Pas assez de points !", 'warning');
   }
 }
 

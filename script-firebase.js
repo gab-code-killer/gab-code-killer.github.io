@@ -337,9 +337,17 @@ function afficherClassementComplet(tousLesJoueurs) {
   contenu.style.width = "90%";
   
   const titre = document.createElement("h2");
-  titre.textContent = "🏆 Classement Complet";
+  const nombreTotal = tousLesJoueurs.length;
+  const nombreAffiche = Math.min(10000, nombreTotal);
+  
+  if (nombreTotal > 10000) {
+    titre.textContent = `🏆 TOP 10 000 (sur ${nombreTotal.toLocaleString('fr-FR')} joueurs)`;
+  } else {
+    titre.textContent = `🏆 Classement Complet (${nombreTotal.toLocaleString('fr-FR')} joueurs)`;
+  }
   titre.style.textAlign = "center";
   titre.style.marginTop = "0";
+  titre.style.fontSize = "18px";
   
   const listeComplete = document.createElement("div");
   listeComplete.style.maxHeight = "400px";
@@ -348,20 +356,33 @@ function afficherClassementComplet(tousLesJoueurs) {
   listeComplete.style.border = "1px solid #ddd";
   listeComplete.style.borderRadius = "5px";
   
-  // Ajouter tous les joueurs
-  for (let i = 0; i < tousLesJoueurs.length; i++) {
+  // Vérifier si le joueur connecté est dans les 10 000 premiers
+  let joueurDansTop10k = false;
+  let positionJoueurConnecte = -1;
+  
+  for (let i = 0; i < Math.min(10000, tousLesJoueurs.length); i++) {
+    if (donneesUtilisateur && tousLesJoueurs[i].pseudo === donneesUtilisateur.pseudo) {
+      joueurDansTop10k = true;
+      positionJoueurConnecte = i + 1;
+      break;
+    }
+  }
+
+  // Ajouter les 10 000 premiers joueurs (ou moins si il y en a moins)
+  for (let i = 0; i < nombreAffiche; i++) {
     const joueur = tousLesJoueurs[i];
     const rang = document.createElement("p");
     rang.textContent = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
     rang.style.margin = "3px 0";
     rang.style.padding = "5px";
+    rang.style.fontSize = "13px";
     
     // Alternance de couleurs
     if (i % 2 === 0) {
       rang.style.backgroundColor = "#f8f9fa";
     }
     
-    // Mettre en évidence le joueur connecté
+    // Mettre en évidence le joueur connecté s'il est dans le top 10k
     if (donneesUtilisateur && joueur.pseudo === donneesUtilisateur.pseudo) {
       rang.style.backgroundColor = "#e3f2fd";
       rang.style.borderRadius = "8px";
@@ -378,6 +399,58 @@ function afficherClassementComplet(tousLesJoueurs) {
     }
     
     listeComplete.appendChild(rang);
+  }
+  
+  // Si il y a plus de 10 000 joueurs, ajouter un indicateur
+  if (nombreTotal > 10000) {
+    const indicateur = document.createElement("div");
+    indicateur.style.padding = "15px";
+    indicateur.style.backgroundColor = "#fff3cd";
+    indicateur.style.border = "1px solid #ffeaa7";
+    indicateur.style.borderRadius = "8px";
+    indicateur.style.margin = "10px 0";
+    indicateur.style.textAlign = "center";
+    indicateur.style.fontWeight = "bold";
+    indicateur.style.color = "#856404";
+    
+    const nombreRestant = (nombreTotal - 10000).toLocaleString('fr-FR');
+    indicateur.innerHTML = `
+      <div style="font-size: 16px; margin-bottom: 5px;">⬇️ Et encore ${nombreRestant} joueurs...</div>
+      <div style="font-size: 12px; opacity: 0.8;">Seuls les 10 000 premiers sont affichés pour les performances</div>
+    `;
+    
+    listeComplete.appendChild(indicateur);
+  }
+  
+  // Si le joueur connecté n'est pas dans le top 10k, l'afficher séparément
+  if (!joueurDansTop10k && donneesUtilisateur) {
+    // Trouver la vraie position du joueur
+    let vraiePosition = -1;
+    for (let i = 0; i < tousLesJoueurs.length; i++) {
+      if (tousLesJoueurs[i].pseudo === donneesUtilisateur.pseudo) {
+        vraiePosition = i + 1;
+        break;
+      }
+    }
+    
+    if (vraiePosition > -1) {
+      const votrePositionDiv = document.createElement("div");
+      votrePositionDiv.style.padding = "15px";
+      votrePositionDiv.style.backgroundColor = "#e3f2fd";
+      votrePositionDiv.style.border = "2px solid #1976d2";
+      votrePositionDiv.style.borderRadius = "10px";
+      votrePositionDiv.style.margin = "15px 0";
+      votrePositionDiv.style.textAlign = "center";
+      
+      votrePositionDiv.innerHTML = `
+        <div style="font-weight: bold; color: #1976d2; font-size: 14px; margin-bottom: 5px;">📍 VOTRE POSITION</div>
+        <div style="font-weight: bold; color: #1976d2; font-size: 16px;">
+          ${vraiePosition.toLocaleString('fr-FR')}. ${donneesUtilisateur.pseudo} - ${donneesUtilisateur.score} points 👤 (Vous)
+        </div>
+      `;
+      
+      listeComplete.appendChild(votrePositionDiv);
+    }
   }
   
   const boutonFermer = document.createElement("button");
