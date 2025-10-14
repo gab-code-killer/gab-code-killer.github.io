@@ -1,22 +1,41 @@
-// Vérifier si l'utilisateur est connecté
-const emailConnecte = localStorage.getItem("utilisateurConnecte");
-if (!emailConnecte) {
-  window.location.href = "accueil.html";
-}
+// Variables Firebase
+let utilisateurActuel = null;
+let donneesUtilisateur = null;
 
-const compteUtilisateur = JSON.parse(localStorage.getItem(emailConnecte));
-if (!compteUtilisateur) {
-  window.location.href = "accueil.html";
-}
-
-// Initialiser les améliorations si elles n'existent pas
-if (!compteUtilisateur.ameliorations) {
-  compteUtilisateur.ameliorations = {
-    niveauClic: 1,  // Niveau actuel (commence à 1)
-    pointsParClic: 1 // Points gagnés par clic
-  };
-  localStorage.setItem(emailConnecte, JSON.stringify(compteUtilisateur));
-}
+// Vérifier si l'utilisateur est connecté avec Firebase
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // Utilisateur connecté
+    utilisateurActuel = user;
+    console.log("✅ Utilisateur connecté :", user.email);
+    
+    // Récupérer les données de l'utilisateur depuis Firestore
+    db.collection('users').doc(user.uid).get()
+      .then((doc) => {
+        if (doc.exists) {
+          donneesUtilisateur = doc.data();
+          
+          // Initialiser les améliorations si elles n'existent pas
+          if (!donneesUtilisateur.pointsParClic) {
+            donneesUtilisateur.pointsParClic = 1;
+            donneesUtilisateur.niveauClic = 1;
+            
+            // Sauvegarder dans Firebase
+            db.collection('users').doc(user.uid).update({
+              pointsParClic: 1,
+              niveauClic: 1
+            });
+          }
+          
+          mettreAJourAffichage();
+        }
+      });
+  } else {
+    // Pas d'utilisateur connecté, rediriger vers accueil
+    console.log("❌ Pas d'utilisateur connecté");
+    window.location.href = "accueil.html";
+  }
+});
 
 // Fonction pour calculer le prix de la prochaine amélioration
 function calculerPrix(niveauActuel) {
@@ -31,14 +50,14 @@ function calculerPrix(niveauActuel) {
 
 // Mettre à jour l'affichage
 function mettreAJourAffichage() {
-  // Recharger les données depuis localStorage pour être sûr d'avoir les plus récentes
-  const compteFrais = JSON.parse(localStorage.getItem(emailConnecte));
-  const niveau = compteFrais.ameliorations.niveauClic || 1;
-  const pointsParClic = compteFrais.ameliorations.pointsParClic || 1;
-  const prix = calculerPrix(niveau); // Passer le niveau actuel
-  const score = compteFrais.score || 0;
+  if (!donneesUtilisateur) return;
+  
+  const niveau = donneesUtilisateur.niveauClic || 1;
+  const pointsParClic = donneesUtilisateur.pointsParClic || 1;
+  const prix = calculerPrix(niveau);
+  const score = donneesUtilisateur.score || 0;
 
-  document.getElementById("pseudoAffiche").textContent = `Salut ${compteFrais.pseudo} ! 👋`;
+  document.getElementById("pseudoAffiche").textContent = `Salut ${donneesUtilisateur.pseudo} ! 👋`;
   document.getElementById("scoreAffiche").textContent = `Vos points: ${score}`;
   document.getElementById("niveauActuel").textContent = niveau;
   document.getElementById("pointsParClic").textContent = pointsParClic;
@@ -59,29 +78,35 @@ function mettreAJourAffichage() {
 
 // Fonction pour acheter l'amélioration
 function acheterAmelioration() {
-  // Recharger les données les plus récentes
-  const compteFrais = JSON.parse(localStorage.getItem(emailConnecte));
-  const niveau = compteFrais.ameliorations.niveauClic || 1;
-  const prix = calculerPrix(niveau); // Passer le niveau actuel
-  const score = compteFrais.score || 0;
+  if (!donneesUtilisateur || !utilisateurActuel) return;
+  
+  const niveau = donneesUtilisateur.niveauClic || 1;
+  const prix = calculerPrix(niveau);
+  const score = donneesUtilisateur.score || 0;
 
   if (score >= prix) {
-    // Déduire le prix du score
-    compteFrais.score = score - prix;
-    
-    // Augmenter le niveau et les points par clic
-    compteFrais.ameliorations.niveauClic += 1;
-    compteFrais.ameliorations.pointsParClic += 1;
+    // Calculer les nouvelles valeurs
+    const nouveauScore = score - prix;
+    const nouveauNiveau = niveau + 1;
+    const nouveauxPointsParClic = (donneesUtilisateur.pointsParClic || 1) + 1;
 
-    // Sauvegarder les nouvelles données
-    localStorage.setItem(emailConnecte, JSON.stringify(compteFrais));
-
-    alert(`🎉 Amélioration achetée ! Maintenant tu gagnes ${compteFrais.ameliorations.pointsParClic} points par clic !`);
-    
-    // Mettre à jour l'affichage APRÈS l'alert pour éviter les conflits
-    setTimeout(() => {
+    // Mettre à jour dans Firebase
+    db.collection('users').doc(utilisateurActuel.uid).update({
+      score: nouveauScore,
+      niveauClic: nouveauNiveau,
+      pointsParClic: nouveauxPointsParClic
+    }).then(() => {
+      // Mettre à jour les données locales
+      donneesUtilisateur.score = nouveauScore;
+      donneesUtilisateur.niveauClic = nouveauNiveau;
+      donneesUtilisateur.pointsParClic = nouveauxPointsParClic;
+      
+      alert(`🎉 Amélioration achetée ! Maintenant tu gagnes ${nouveauxPointsParClic} points par clic !`);
       mettreAJourAffichage();
-    }, 100);
+    }).catch((error) => {
+      console.error("Erreur lors de l'achat:", error);
+      alert("❌ Erreur lors de l'achat !");
+    });
   } else {
     alert("❌ Pas assez de points !");
   }

@@ -141,3 +141,23 @@ body {
 .contenu-visible {
     opacity: 1;
 }
+
+/* Styles pour un affichage plus compact */
+#contenu-principal h1 {
+    margin: 15px 0 10px 0;
+    font-size: 2em;
+}
+
+#contenu-principal h2 {
+    margin: 10px 0;
+    font-size: 1.3em;
+}
+
+#classement {
+    margin-top: 15px;
+}
+
+#classement h3 {
+    margin: 10px 0;
+    font-size: 1.4em;
+}

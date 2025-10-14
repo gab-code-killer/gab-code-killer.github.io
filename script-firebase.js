@@ -1,12 +1,60 @@
-const pseudoAffiche = document.getElementById("pseudoAffiche");
-const boutonJeu = document.getElementById("boutonJeu");
-const scoreAffiche = document.getElementById("scoreAffiche");
-const classement = document.getElementById("classement");
-const boutonDeconnexion = document.getElementById("boutonDeconnexion");
-
 // Variables Firebase
 let utilisateurActuel = null;
 let donneesUtilisateur = null;
+
+// Variables pour les éléments DOM (seront initialisées après l'affichage du contenu)
+let pseudoAffiche = null;
+let boutonJeu = null;
+let scoreAffiche = null;
+let classement = null;
+let boutonDeconnexion = null;
+
+// Fonction pour initialiser les éléments DOM une fois le contenu affiché
+function initialiserElementsDOM() {
+  pseudoAffiche = document.getElementById("pseudoAffiche");
+  boutonJeu = document.getElementById("boutonJeu");
+  scoreAffiche = document.getElementById("scoreAffiche");
+  classement = document.getElementById("classement");
+  boutonDeconnexion = document.getElementById("boutonDeconnexion");
+  
+  // Ajouter les événements
+  if (boutonJeu) {
+    boutonJeu.addEventListener("click", function () {
+      if (donneesUtilisateur && utilisateurActuel) {
+        // Augmenter le score (récupérer les améliorations depuis Firebase)
+        const nouveauScore = (donneesUtilisateur.score || 0) + (donneesUtilisateur.pointsParClic || 1);
+        
+        // Mettre à jour dans Firestore
+        db.collection('users').doc(utilisateurActuel.uid).update({
+          score: nouveauScore
+        }).then(() => {
+          donneesUtilisateur.score = nouveauScore;
+          scoreAffiche.textContent = `Score: ${nouveauScore}`;
+          afficherClassement();
+        });
+      }
+    });
+  }
+
+  if (boutonDeconnexion) {
+    boutonDeconnexion.addEventListener("click", function () {
+      auth.signOut().then(() => {
+        console.log("Déconnecté avec succès");
+        window.location.href = "accueil.html";
+      }).catch((error) => {
+        console.error("Erreur déconnexion:", error);
+      });
+    });
+  }
+
+  // Bouton améliorations
+  const boutonAmeliorations = document.getElementById("boutonAmeliorations");
+  if (boutonAmeliorations) {
+    boutonAmeliorations.addEventListener("click", function () {
+      window.location.href = "ameliorations.html";
+    });
+  }
+}
 
 // Fonction pour masquer l'écran de chargement et afficher le contenu
 function afficherContenu() {
@@ -19,6 +67,18 @@ function afficherContenu() {
       ecranChargement.style.display = "none";
       contenuPrincipal.classList.remove("contenu-cache");
       contenuPrincipal.classList.add("contenu-visible");
+      
+      // IMPORTANT : Initialiser les éléments DOM APRÈS que le contenu soit affiché
+      setTimeout(() => {
+        initialiserElementsDOM();
+        
+        // Afficher les données utilisateur
+        if (donneesUtilisateur && pseudoAffiche && scoreAffiche) {
+          pseudoAffiche.textContent = `Salut ${donneesUtilisateur.pseudo} !`;
+          scoreAffiche.textContent = `Score: ${donneesUtilisateur.score || 0}`;
+          afficherClassement();
+        }
+      }, 100);
     }, 500);
   }, 1500); // Attendre 1.5 secondes pour montrer le chargement
 }
@@ -54,10 +114,8 @@ auth.onAuthStateChanged((user) => {
       .then((doc) => {
         if (doc.exists) {
           donneesUtilisateur = doc.data();
-          pseudoAffiche.textContent = `Salut ${donneesUtilisateur.pseudo} !`;
-          scoreAffiche.textContent = `Score: ${donneesUtilisateur.score || 0}`;
-          afficherClassement();
           // Afficher le contenu avec une belle transition
+          // L'affichage des données se fera dans afficherContenu()
           afficherContenu();
         }
       });
@@ -130,73 +188,213 @@ function afficherClassement() {
       
       classement.innerHTML = "<h3>Classement :</h3>";
       
-      // Créer une div avec molette pour tous les joueurs
-      const listeComplete = document.createElement("div");
-      listeComplete.style.maxHeight = "300px";
-      listeComplete.style.overflowY = "auto";
-      listeComplete.style.padding = "10px 20px";
-      listeComplete.style.margin = "10px auto";
-      listeComplete.style.width = "350px";
-      
-      // Ajouter tous les joueurs dans la liste
+      // Trouver la position du joueur connecté
+      let positionJoueur = -1;
+      let joueurConnecte = null;
       for (let i = 0; i < tousLesJoueurs.length; i++) {
+        if (donneesUtilisateur && tousLesJoueurs[i].pseudo === donneesUtilisateur.pseudo) {
+          positionJoueur = i + 1;
+          joueurConnecte = tousLesJoueurs[i];
+          break;
+        }
+      }
+
+      // Afficher le TOP 5 (plus compact)
+      const top5 = document.createElement("div");
+      top5.innerHTML = "<h4 style='margin: 10px 0; font-size: 18px;'>🏆 TOP 5</h4>";
+      top5.style.marginBottom = "15px";
+      
+      const listeTop5 = document.createElement("div");
+      listeTop5.style.padding = "8px";
+      listeTop5.style.backgroundColor = "#f8f9fa";
+      listeTop5.style.borderRadius = "6px";
+      listeTop5.style.margin = "8px auto";
+      listeTop5.style.width = "300px";
+      
+      // Afficher les 5 premiers seulement
+      for (let i = 0; i < Math.min(5, tousLesJoueurs.length); i++) {
         const joueur = tousLesJoueurs[i];
         const rang = document.createElement("p");
         rang.textContent = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
-        rang.style.margin = "5px 0";
+        rang.style.margin = "2px 0";
         rang.style.padding = "3px";
+        rang.style.fontSize = "14px";
         
-        // Mettre en évidence le joueur connecté
+        // Couleur or, argent, bronze pour le podium
+        if (i === 0) {
+          rang.style.backgroundColor = "#FFD700";
+          rang.style.fontWeight = "bold";
+          rang.textContent = `🥇 ${rang.textContent}`;
+        } else if (i === 1) {
+          rang.style.backgroundColor = "#C0C0C0";
+          rang.style.fontWeight = "bold";
+          rang.textContent = `🥈 ${rang.textContent}`;
+        } else if (i === 2) {
+          rang.style.backgroundColor = "#CD7F32";
+          rang.style.fontWeight = "bold";
+          rang.textContent = `🥉 ${rang.textContent}`;
+        }
+        
+        // Mettre en évidence le joueur connecté s'il est dans le top 5
         if (donneesUtilisateur && joueur.pseudo === donneesUtilisateur.pseudo) {
           rang.style.backgroundColor = "#e3f2fd";
-          rang.style.borderRadius = "8px";
-          rang.style.fontWeight = "bold";
+          rang.style.border = "2px solid #1976d2";
           rang.style.color = "#1976d2";
-          rang.style.padding = "8px";
-          rang.textContent += " (Vous)";
+          rang.style.borderRadius = "6px";
+          rang.textContent += " 👤 (Vous)";
         }
         
-        // Alternance de couleurs pour la lisibilité
-        if (i % 2 === 0) {
-          rang.style.backgroundColor = rang.style.backgroundColor || "#f8f9fa";
-        }
-        
-        listeComplete.appendChild(rang);
+        listeTop5.appendChild(rang);
       }
       
-      classement.appendChild(listeComplete);
+      top5.appendChild(listeTop5);
+      classement.appendChild(top5);
+
+      // Afficher VOTRE POSITION si elle n'est pas dans le top 5
+      if (positionJoueur > 5 && joueurConnecte) {
+        const votrePosition = document.createElement("div");
+        votrePosition.innerHTML = "<h4 style='margin: 10px 0; font-size: 16px;'>📍 VOTRE POSITION</h4>";
+        votrePosition.style.marginTop = "15px";
+        
+        const positionBox = document.createElement("div");
+        positionBox.style.padding = "10px";
+        positionBox.style.backgroundColor = "#e3f2fd";
+        positionBox.style.border = "2px solid #1976d2";
+        positionBox.style.borderRadius = "8px";
+        positionBox.style.margin = "8px auto";
+        positionBox.style.width = "300px";
+        positionBox.style.fontWeight = "bold";
+        positionBox.style.color = "#1976d2";
+        
+        const rangJoueur = document.createElement("p");
+        rangJoueur.textContent = `${positionJoueur}. ${joueurConnecte.pseudo} - ${joueurConnecte.score} points 👤 (Vous)`;
+        rangJoueur.style.margin = "0";
+        rangJoueur.style.fontSize = "14px";
+        
+        positionBox.appendChild(rangJoueur);
+        votrePosition.appendChild(positionBox);
+        classement.appendChild(votrePosition);
+      }
+
+      // Bouton pour voir le classement complet (plus petit)
+      const boutonComplet = document.createElement("button");
+      boutonComplet.textContent = "📋 Classement complet";
+      boutonComplet.style.padding = "8px 15px";
+      boutonComplet.style.backgroundColor = "#2196F3";
+      boutonComplet.style.color = "white";
+      boutonComplet.style.border = "none";
+      boutonComplet.style.borderRadius = "5px";
+      boutonComplet.style.cursor = "pointer";
+      boutonComplet.style.marginTop = "10px";
+      boutonComplet.style.fontSize = "13px";
+      boutonComplet.style.transition = "0.3s";
+      
+      boutonComplet.addEventListener("click", () => {
+        // Créer une popup avec le classement complet
+        afficherClassementComplet(tousLesJoueurs);
+      });
+      
+      classement.appendChild(boutonComplet);
     })
     .catch((error) => {
       console.error("Erreur lors de la récupération du classement:", error);
     });
 }
 
-// Logique du jeu avec Firebase
-boutonJeu.addEventListener("click", function () {
-  if (donneesUtilisateur && utilisateurActuel) {
-    const nouveauScore = (donneesUtilisateur.score || 0) + 1;
-    
-    // Mettre à jour le score dans Firestore
-    db.collection('users').doc(utilisateurActuel.uid).update({
-      score: nouveauScore
-    })
-    .then(() => {
-      donneesUtilisateur.score = nouveauScore;
-      scoreAffiche.textContent = `Score: ${nouveauScore}`;
-      afficherClassement();
-    })
-    .catch((error) => {
-      console.error("Erreur mise à jour score:", error);
-    });
-  }
-});
+// Fonction pour afficher le classement complet dans une popup
+function afficherClassementComplet(tousLesJoueurs) {
+  // Créer la popup
+  const popup = document.createElement("div");
+  popup.style.position = "fixed";
+  popup.style.top = "0";
+  popup.style.left = "0";
+  popup.style.width = "100%";
+  popup.style.height = "100%";
+  popup.style.backgroundColor = "rgba(0,0,0,0.7)";
+  popup.style.zIndex = "1000";
+  popup.style.display = "flex";
+  popup.style.justifyContent = "center";
+  popup.style.alignItems = "center";
 
-// Déconnexion
-boutonDeconnexion.addEventListener("click", function () {
-  auth.signOut().then(() => {
-    console.log("Déconnecté avec succès");
-    window.location.href = "accueil.html";
-  }).catch((error) => {
-    console.error("Erreur déconnexion:", error);
+  const contenu = document.createElement("div");
+  contenu.style.backgroundColor = "white";
+  contenu.style.padding = "20px";
+  contenu.style.borderRadius = "10px";
+  contenu.style.maxWidth = "500px";
+  contenu.style.maxHeight = "80%";
+  contenu.style.width = "90%";
+  
+  const titre = document.createElement("h2");
+  titre.textContent = "🏆 Classement Complet";
+  titre.style.textAlign = "center";
+  titre.style.marginTop = "0";
+  
+  const listeComplete = document.createElement("div");
+  listeComplete.style.maxHeight = "400px";
+  listeComplete.style.overflowY = "auto";
+  listeComplete.style.padding = "10px";
+  listeComplete.style.border = "1px solid #ddd";
+  listeComplete.style.borderRadius = "5px";
+  
+  // Ajouter tous les joueurs
+  for (let i = 0; i < tousLesJoueurs.length; i++) {
+    const joueur = tousLesJoueurs[i];
+    const rang = document.createElement("p");
+    rang.textContent = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
+    rang.style.margin = "3px 0";
+    rang.style.padding = "5px";
+    
+    // Alternance de couleurs
+    if (i % 2 === 0) {
+      rang.style.backgroundColor = "#f8f9fa";
+    }
+    
+    // Mettre en évidence le joueur connecté
+    if (donneesUtilisateur && joueur.pseudo === donneesUtilisateur.pseudo) {
+      rang.style.backgroundColor = "#e3f2fd";
+      rang.style.borderRadius = "8px";
+      rang.style.fontWeight = "bold";
+      rang.style.color = "#1976d2";
+      rang.style.padding = "8px";
+      rang.style.border = "2px solid #1976d2";
+      rang.textContent += " 👤 (Vous)";
+      
+      // Faire défiler automatiquement jusqu'au joueur
+      setTimeout(() => {
+        rang.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+    
+    listeComplete.appendChild(rang);
+  }
+  
+  const boutonFermer = document.createElement("button");
+  boutonFermer.textContent = "Fermer";
+  boutonFermer.style.padding = "10px 20px";
+  boutonFermer.style.backgroundColor = "#f44336";
+  boutonFermer.style.color = "white";
+  boutonFermer.style.border = "none";
+  boutonFermer.style.borderRadius = "5px";
+  boutonFermer.style.cursor = "pointer";
+  boutonFermer.style.marginTop = "15px";
+  boutonFermer.style.width = "100%";
+  
+  boutonFermer.addEventListener("click", () => {
+    document.body.removeChild(popup);
   });
-});
+  
+  // Fermer en cliquant sur le fond
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) {
+      document.body.removeChild(popup);
+    }
+  });
+  
+  contenu.appendChild(titre);
+  contenu.appendChild(listeComplete);
+  contenu.appendChild(boutonFermer);
+  popup.appendChild(contenu);
+  document.body.appendChild(popup);
+}
+
+// Les événements sont maintenant gérés dans initialiserElementsDOM()
