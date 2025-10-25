@@ -85,6 +85,13 @@ auth.onAuthStateChanged((user) => {
             });
           }
           
+          // 🔥 NOUVEAU: Récupérer le score local depuis sessionStorage
+          const scoreLocal = sessionStorage.getItem('scoreLocal');
+          if (scoreLocal) {
+            donneesUtilisateur.score = parseInt(scoreLocal);
+            console.log("📊 Score local récupéré:", scoreLocal);
+          }
+          
           mettreAJourAffichage();
         }
       });
@@ -153,6 +160,14 @@ function acheterAmelioration() {
     const nouveauNiveau = niveau + 1;
     const nouveauxPointsParClic = (donneesUtilisateur.pointsParClic || 1) + 1;
 
+    // Mettre à jour les données locales d'abord
+    donneesUtilisateur.score = nouveauScore;
+    donneesUtilisateur.niveauClic = nouveauNiveau;
+    donneesUtilisateur.pointsParClic = nouveauxPointsParClic;
+    
+    // 🔥 NOUVEAU: Mettre à jour le sessionStorage
+    sessionStorage.setItem('scoreLocal', nouveauScore.toString());
+    
     // Mettre à jour dans Firebase
     db.collection('users').doc(utilisateurActuel.uid).update({
       score: nouveauScore,
@@ -162,10 +177,14 @@ function acheterAmelioration() {
       // Amélioration achetée avec succès !
       afficherNotification(`🎉 Amélioration achetée ! Maintenant tu gagnes ${nouveauxPointsParClic} points par clic !`, 'success', 2000);
       
-      // Recharger la page pour synchroniser toutes les données
+      // Mettre à jour l'affichage immédiatement
+      mettreAJourAffichage();
+      
+      // Réactiver le bouton
       setTimeout(() => {
-        window.location.reload();
-      }, 2200); // Laisser le temps de voir la notification
+        boutonAcheter.disabled = false;
+        mettreAJourAffichage();
+      }, 2200);
     }).catch((error) => {
       console.error("Erreur lors de l'achat:", error);
       afficherNotification("❌ Erreur lors de l'achat !", 'error');

@@ -39,10 +39,15 @@ body {
     transition: 0.3s;
 }
 
-.deconnexion {
+.boutons-haut {
     position: absolute;
     top: 20px;
     right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.deconnexion {
     width: 120px;
     height: 40px;
     border-radius: 10px;
@@ -81,6 +86,40 @@ body {
 .ameliorations:hover {
     background-color: #F57C00;
     transform: scale(1.05);
+}
+
+.quitter {
+    width: 130px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 13px;
+    background-color: #9C27B0;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.quitter:hover {
+    background-color: #7B1FA2;
+    transform: scale(1.05);
+}
+
+.avertissement-sauvegarde {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    font-size: 12px;
+    color: #FF6B00;
+    margin: 0;
+    max-width: 250px;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    background-color: rgba(255, 107, 0, 0.1);
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 107, 0, 0.3);
+    text-align: center;
 }
 
 /* Styles pour l'écran de chargement */

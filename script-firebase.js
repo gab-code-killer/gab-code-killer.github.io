@@ -1,6 +1,7 @@
 // Variables Firebase
 let utilisateurActuel = null;
 let donneesUtilisateur = null;
+let jeuInitialise = false; // Variable pour éviter les redirections après initialisation
 
 // Variables pour les éléments DOM (seront initialisées après l'affichage du contenu)
 let pseudoAffiche = null;
@@ -21,17 +22,21 @@ function initialiserElementsDOM() {
   if (boutonJeu) {
     boutonJeu.addEventListener("click", function () {
       if (donneesUtilisateur && utilisateurActuel) {
-        // Augmenter le score (récupérer les améliorations depuis Firebase)
+        // Augmenter le score SEULEMENT EN LOCAL (pas dans Firebase)
         const nouveauScore = (donneesUtilisateur.score || 0) + (donneesUtilisateur.pointsParClic || 1);
         
-        // Mettre à jour dans Firestore
-        db.collection('users').doc(utilisateurActuel.uid).update({
-          score: nouveauScore
-        }).then(() => {
-          donneesUtilisateur.score = nouveauScore;
-          scoreAffiche.textContent = `Score: ${nouveauScore}`;
-          afficherClassement();
-        });
+        // Mettre à jour SEULEMENT les données locales
+        donneesUtilisateur.score = nouveauScore;
+        scoreAffiche.textContent = `Score: ${nouveauScore}`;
+        
+        // 🔥 NOUVEAU: Sauvegarder le score local dans sessionStorage
+        sessionStorage.setItem('scoreLocal', nouveauScore.toString());
+        
+        // 🔥 NOUVEAU: Mettre à jour le classement avec le nouveau score
+        afficherClassement();
+        
+        // On ne sauvegarde PAS dans Firebase ici !
+        console.log("Score local mis à jour:", nouveauScore);
       }
     });
   }
@@ -52,6 +57,14 @@ function initialiserElementsDOM() {
   if (boutonAmeliorations) {
     boutonAmeliorations.addEventListener("click", function () {
       window.location.href = "ameliorations.html";
+    });
+  }
+
+  // Bouton quitter avec ta popup
+  const boutonQuitter = document.getElementById("boutonQuitter");
+  if (boutonQuitter) {
+    boutonQuitter.addEventListener("click", function () {
+      creerPopupSauvegardePersonnalisee();
     });
   }
 }
@@ -114,16 +127,27 @@ auth.onAuthStateChanged((user) => {
       .then((doc) => {
         if (doc.exists) {
           donneesUtilisateur = doc.data();
-          // Afficher le contenu avec une belle transition
-          // L'affichage des données se fera dans afficherContenu()
-          afficherContenu();
+          
+          // 🔥 NOUVEAU: Récupérer le score local depuis sessionStorage au chargement
+          const scoreLocal = sessionStorage.getItem('scoreLocal');
+          if (scoreLocal) {
+            donneesUtilisateur.score = parseInt(scoreLocal);
+            console.log("📊 Score local récupéré au chargement:", scoreLocal);
+          } else {
+            // Initialiser le sessionStorage avec le score Firebase
+            sessionStorage.setItem('scoreLocal', donneesUtilisateur.score.toString());
+          }
+          
+          // Afficher le contenu seulement si pas encore initialisé
+          if (!jeuInitialise) {
+            afficherContenu();
+            jeuInitialise = true; // Marquer comme initialisé
+          }
         }
       });
-  } else {
-    // Pas d'utilisateur connecté
+  } else if (!jeuInitialise) {
+    // Rediriger seulement si le jeu n'est pas encore initialisé
     console.log("❌ Pas d'utilisateur connecté");
-    
-    // Redirection douce vers accueil
     redirigerVersAccueil();
   }
 });
@@ -191,6 +215,18 @@ function afficherClassement() {
           score: data.score || 0
         });
       });
+      
+      // 🔥 NOUVEAU: Remplacer le score du joueur connecté par son score local
+      if (donneesUtilisateur) {
+        // Trouver et remplacer le score du joueur connecté
+        for (let i = 0; i < joueursReels.length; i++) {
+          if (joueursReels[i].pseudo === donneesUtilisateur.pseudo) {
+            joueursReels[i].score = donneesUtilisateur.score; // Score local
+            console.log("📊 Score local utilisé dans classement:", donneesUtilisateur.score);
+            break;
+          }
+        }
+      }
       
       // Combiner joueurs réels et fictifs
       const tousLesJoueurs = [...joueursFictifs, ...joueursReels];
@@ -481,5 +517,114 @@ function afficherClassementComplet(tousLesJoueurs) {
   popup.appendChild(contenu);
   document.body.appendChild(popup);
 }
+
+// Créer notre propre popup avec "Save" et "Cancel"
+function creerPopupSauvegardePersonnalisee() {
+  // Créer le fond sombre
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0,0,0,0.3)';
+  overlay.style.zIndex = '10000';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+
+  // Créer la popup qui ressemble au navigateur
+  const popup = document.createElement('div');
+  popup.style.backgroundColor = '#f7f7f7';
+  popup.style.border = '1px solid #ccc';
+  popup.style.borderRadius = '8px';
+  popup.style.padding = '20px';
+  popup.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
+  popup.style.fontSize = '14px';
+  popup.style.color = '#333';
+  popup.style.minWidth = '400px';
+  popup.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+
+  // Icône et titre
+  const header = document.createElement('div');
+  header.style.display = 'flex';
+  header.style.alignItems = 'center';
+  header.style.marginBottom = '15px';
+  
+  const icon = document.createElement('div');
+  icon.innerHTML = '⚠️';
+  icon.style.fontSize = '20px';
+  icon.style.marginRight = '10px';
+  
+  const titre = document.createElement('div');
+  titre.textContent = 'Sauvegarder vos modifications';
+  titre.style.fontWeight = '500';
+  
+  header.appendChild(icon);
+  header.appendChild(titre);
+
+  // Message
+  const message = document.createElement('div');
+  message.textContent = 'Votre progression sera sauvegardée sur votre compte.';
+  message.style.marginBottom = '20px';
+  message.style.color = '#666';
+
+  // Conteneur des boutons
+  const boutonsContainer = document.createElement('div');
+  boutonsContainer.style.display = 'flex';
+  boutonsContainer.style.gap = '10px';
+  boutonsContainer.style.justifyContent = 'flex-end';
+
+  // Bouton Save
+  const btnSave = document.createElement('button');
+  btnSave.textContent = 'Sauvegarder';
+  btnSave.style.backgroundColor = '#007AFF';
+  btnSave.style.color = 'white';
+  btnSave.style.border = 'none';
+  btnSave.style.padding = '8px 16px';
+  btnSave.style.borderRadius = '6px';
+  btnSave.style.cursor = 'pointer';
+  btnSave.style.fontWeight = '500';
+  btnSave.onclick = () => {
+    // Fermer la popup immédiatement
+    document.body.removeChild(overlay);
+    
+    // Sauvegarder en arrière-plan
+    if (donneesUtilisateur && utilisateurActuel) {
+      db.collection('users').doc(utilisateurActuel.uid).update({
+        score: donneesUtilisateur.score || 0
+      }).then(() => {
+        console.log("✅ Score sauvegardé !");
+      }).catch((error) => {
+        console.error("❌ Erreur sauvegarde:", error);
+      });
+    }
+  };
+
+  // Bouton Cancel
+  const btnCancel = document.createElement('button');
+  btnCancel.textContent = 'Annuler';
+  btnCancel.style.backgroundColor = '#f0f0f0';
+  btnCancel.style.color = '#333';
+  btnCancel.style.border = '1px solid #ccc';
+  btnCancel.style.padding = '8px 16px';
+  btnCancel.style.borderRadius = '6px';
+  btnCancel.style.cursor = 'pointer';
+  btnCancel.onclick = () => {
+    // Juste fermer la popup
+    document.body.removeChild(overlay);
+  };
+
+  // Assembler tout
+  boutonsContainer.appendChild(btnCancel);
+  boutonsContainer.appendChild(btnSave);
+  popup.appendChild(header);
+  popup.appendChild(message);
+  popup.appendChild(boutonsContainer);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+}
+
+
 
 // Les événements sont maintenant gérés dans initialiserElementsDOM()
