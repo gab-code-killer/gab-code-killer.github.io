@@ -32,8 +32,8 @@ function initialiserElementsDOM() {
         // 🔥 NOUVEAU: Sauvegarder le score local dans sessionStorage
         sessionStorage.setItem('scoreLocal', nouveauScore.toString());
         
-        // 🔥 NOUVEAU: Mettre à jour le classement avec le nouveau score
-        afficherClassement();
+        // 🔥 NOUVEAU: Mettre à jour seulement ton score dans le classement (plus rapide)
+        mettreAJourScoreClassement(nouveauScore);
         
         // On ne sauvegarde PAS dans Firebase ici !
         console.log("Score local mis à jour:", nouveauScore);
@@ -128,14 +128,33 @@ auth.onAuthStateChanged((user) => {
         if (doc.exists) {
           donneesUtilisateur = doc.data();
           
-          // 🔥 NOUVEAU: Récupérer le score local depuis sessionStorage au chargement
+          // 🔥 NOUVEAU: Récupérer les données locales depuis sessionStorage au chargement
           const scoreLocal = sessionStorage.getItem('scoreLocal');
+          const niveauLocal = sessionStorage.getItem('niveauLocal');
+          const pointsParClicLocal = sessionStorage.getItem('pointsParClicLocal');
+          
           if (scoreLocal) {
             donneesUtilisateur.score = parseInt(scoreLocal);
             console.log("📊 Score local récupéré au chargement:", scoreLocal);
           } else {
             // Initialiser le sessionStorage avec le score Firebase
             sessionStorage.setItem('scoreLocal', donneesUtilisateur.score.toString());
+          }
+          
+          if (niveauLocal) {
+            donneesUtilisateur.niveauClic = parseInt(niveauLocal);
+          } else {
+            // Initialiser avec les valeurs par défaut si pas de données locales
+            donneesUtilisateur.niveauClic = donneesUtilisateur.niveauClic || 1;
+            sessionStorage.setItem('niveauLocal', donneesUtilisateur.niveauClic.toString());
+          }
+          
+          if (pointsParClicLocal) {
+            donneesUtilisateur.pointsParClic = parseInt(pointsParClicLocal);
+          } else {
+            // Initialiser avec les valeurs par défaut si pas de données locales
+            donneesUtilisateur.pointsParClic = donneesUtilisateur.pointsParClic || 1;
+            sessionStorage.setItem('pointsParClicLocal', donneesUtilisateur.pointsParClic.toString());
           }
           
           // Afficher le contenu seulement si pas encore initialisé
@@ -201,6 +220,20 @@ function genererJoueursFictifs() {
   
   console.log(`✅ Génération terminée ! ${nombreJoueurs.toLocaleString('fr-FR')} joueurs créés.`);
   return joueursFictifs;
+}
+
+// Fonction légère pour mettre à jour seulement le score du joueur connecté
+function mettreAJourScoreClassement(nouveauScore) {
+  // Trouver tous les éléments qui affichent le score du joueur connecté
+  const elements = classement.querySelectorAll('p');
+  elements.forEach(element => {
+    if (element.textContent.includes('👤 (Vous)') && donneesUtilisateur) {
+      // Mise à jour rapide du texte sans recréer le DOM
+      const ancienTexte = element.textContent;
+      const nouveauTexte = ancienTexte.replace(/\d+ points/, `${nouveauScore} points`);
+      element.textContent = nouveauTexte;
+    }
+  });
 }
 
 function afficherClassement() {

@@ -85,11 +85,24 @@ auth.onAuthStateChanged((user) => {
             });
           }
           
-          // 🔥 NOUVEAU: Récupérer le score local depuis sessionStorage
+          // 🔥 NOUVEAU: Récupérer les données locales depuis sessionStorage
           const scoreLocal = sessionStorage.getItem('scoreLocal');
+          const niveauLocal = sessionStorage.getItem('niveauLocal');
+          const pointsParClicLocal = sessionStorage.getItem('pointsParClicLocal');
+          
           if (scoreLocal) {
             donneesUtilisateur.score = parseInt(scoreLocal);
             console.log("📊 Score local récupéré:", scoreLocal);
+          }
+          
+          if (niveauLocal) {
+            donneesUtilisateur.niveauClic = parseInt(niveauLocal);
+            console.log("⚡ Niveau local récupéré:", niveauLocal);
+          }
+          
+          if (pointsParClicLocal) {
+            donneesUtilisateur.pointsParClic = parseInt(pointsParClicLocal);
+            console.log("🎯 Points par clic local récupéré:", pointsParClicLocal);
           }
           
           mettreAJourAffichage();
@@ -122,38 +135,70 @@ function mettreAJourAffichage() {
   const prix = calculerPrix(niveau);
   const score = donneesUtilisateur.score || 0;
 
-  document.getElementById("pseudoAffiche").textContent = `Salut ${donneesUtilisateur.pseudo} ! 👋`;
-  document.getElementById("scoreAffiche").textContent = `Vos points: ${score}`;
-  document.getElementById("niveauActuel").textContent = niveau;
-  document.getElementById("pointsParClic").textContent = pointsParClic;
-  document.getElementById("prixActuel").textContent = `${prix} points`;
+  // 🔥 NOUVEAU: Vérifications de sécurité pour éviter les erreurs null
+  const pseudoAffiche = document.getElementById("pseudoAffiche");
+  const scoreAffiche = document.getElementById("scoreAffiche");
+  const niveauActuel = document.getElementById("niveauActuel");
+  const pointsParClicElement = document.getElementById("pointsParClic");
+  const prixActuel = document.getElementById("prixActuel");
+  const prixAffiche = document.getElementById("prixAffiche");
+  const boutonAcheter = document.getElementById("boutonAcheter");
+
+  if (pseudoAffiche) pseudoAffiche.textContent = `Salut ${donneesUtilisateur.pseudo} ! 👋`;
+  if (scoreAffiche) scoreAffiche.textContent = `Vos points: ${score}`;
+  if (niveauActuel) niveauActuel.textContent = niveau;
+  if (pointsParClicElement) pointsParClicElement.textContent = pointsParClic;
+  if (prixActuel) prixActuel.textContent = `${prix} points`;
   
   // Mettre à jour le texte du prix complet
-  document.getElementById("prixAffiche").innerHTML = `<strong>💰 Prix de l'amélioration: ${prix} points</strong>`;
-
-  const boutonAcheter = document.getElementById("boutonAcheter");
-  if (score >= prix) {
-    boutonAcheter.disabled = false;
-    boutonAcheter.textContent = "Améliorer";
+  if (prixAffiche) prixAffiche.innerHTML = `<strong>💰 Prix de l'amélioration: ${prix} points</strong>`;
+  if (boutonAcheter) {
+    if (score >= prix) {
+      boutonAcheter.disabled = false;
+      boutonAcheter.textContent = "Améliorer";
+    } else {
+      boutonAcheter.disabled = true;
+      boutonAcheter.textContent = `Pas assez de points (${prix - score} manquants)`;
+    }
   } else {
-    boutonAcheter.disabled = true;
-    boutonAcheter.textContent = `Pas assez de points (${prix - score} manquants)`;
+    console.warn("⚠️ Bouton d'achat non trouvé !");
   }
 }
 
 // Fonction pour acheter l'amélioration
 function acheterAmelioration() {
-  if (!donneesUtilisateur || !utilisateurActuel) return;
+  console.log("🛒 Début de l'achat d'amélioration");
+  
+  if (!donneesUtilisateur || !utilisateurActuel) {
+    console.log("❌ Pas de données utilisateur ou pas connecté");
+    return;
+  }
   
   const niveau = donneesUtilisateur.niveauClic || 1;
   const prix = calculerPrix(niveau);
   const score = donneesUtilisateur.score || 0;
+  
+  console.log(`📊 État actuel: Score=${score}, Niveau=${niveau}, Prix=${prix}`);
 
   if (score >= prix) {
+    console.log("✅ Score suffisant, début de l'achat");
+    
     // Désactiver le bouton pendant l'achat
     const boutonAcheter = document.getElementById("boutonAcheter");
+    if (!boutonAcheter) {
+      console.error("❌ Bouton d'achat non trouvé !");
+      return;
+    }
+    
     boutonAcheter.disabled = true;
     boutonAcheter.textContent = "⏳ Achat en cours...";
+    
+    console.log("🔒 Bouton désactivé");
+    
+    // 🔥 SAUVEGARDER les valeurs originales AVANT de les modifier
+    const scoreOriginal = score;
+    const niveauOriginal = niveau;
+    const pointsParClicOriginal = donneesUtilisateur.pointsParClic || 1;
     
     // Calculer les nouvelles valeurs
     const nouveauScore = score - prix;
@@ -167,30 +212,58 @@ function acheterAmelioration() {
     
     // 🔥 NOUVEAU: Mettre à jour le sessionStorage
     sessionStorage.setItem('scoreLocal', nouveauScore.toString());
+    sessionStorage.setItem('niveauLocal', nouveauNiveau.toString());
+    sessionStorage.setItem('pointsParClicLocal', nouveauxPointsParClic.toString());
+    
+    // Timeout de sécurité pour débloquer le bouton au cas où
+    const timeoutId = setTimeout(() => {
+      console.log("⏰ Timeout de sécurité : réactivation du bouton");
+      boutonAcheter.disabled = false;
+      mettreAJourAffichage();
+    }, 5000); // 5 secondes maximum
     
     // Mettre à jour dans Firebase
+    console.log("🔄 Début de la sauvegarde Firebase...");
     db.collection('users').doc(utilisateurActuel.uid).update({
       score: nouveauScore,
       niveauClic: nouveauNiveau,
       pointsParClic: nouveauxPointsParClic
     }).then(() => {
+      console.log("✅ Firebase: Sauvegarde réussie");
+      // Annuler le timeout de sécurité
+      clearTimeout(timeoutId);
+      
       // Amélioration achetée avec succès !
-      afficherNotification(`🎉 Amélioration achetée ! Maintenant tu gagnes ${nouveauxPointsParClic} points par clic !`, 'success', 2000);
+      afficherNotification(`🎉 Amélioration achetée ! Maintenant tu gagnes ${nouveauxPointsParClic} points par clic !`, 'success', 1500);
+      
+      // Réactiver le bouton immédiatement
+      boutonAcheter.disabled = false;
       
       // Mettre à jour l'affichage immédiatement
       mettreAJourAffichage();
       
-      // Réactiver le bouton
-      setTimeout(() => {
-        boutonAcheter.disabled = false;
-        mettreAJourAffichage();
-      }, 2200);
-    }).catch((error) => {
-      console.error("Erreur lors de l'achat:", error);
-      afficherNotification("❌ Erreur lors de l'achat !", 'error');
+      console.log("✅ Amélioration achetée avec succès !");
       
-      // Réactiver le bouton en cas d'erreur
-      const boutonAcheter = document.getElementById("boutonAcheter");
+    }).catch((error) => {
+      // Annuler le timeout de sécurité
+      clearTimeout(timeoutId);
+      
+      console.error("❌ Firebase: Erreur lors de l'achat:", error);
+      console.error("❌ Type d'erreur:", error.code);
+      console.error("❌ Message d'erreur:", error.message);
+      afficherNotification("❌ Erreur lors de l'achat ! Vérifiez votre connexion.", 'error', 3000);
+      
+      // 🔥 IMPORTANT: Remettre les données locales à leur état précédent
+      donneesUtilisateur.score = scoreOriginal;
+      donneesUtilisateur.niveauClic = niveauOriginal;
+      donneesUtilisateur.pointsParClic = pointsParClicOriginal;
+      
+      // Remettre le sessionStorage à l'état précédent
+      sessionStorage.setItem('scoreLocal', scoreOriginal.toString());
+      sessionStorage.setItem('niveauLocal', niveauOriginal.toString());
+      sessionStorage.setItem('pointsParClicLocal', pointsParClicOriginal.toString());
+      
+      // Réactiver le bouton immédiatement
       boutonAcheter.disabled = false;
       mettreAJourAffichage(); // Remet le bon texte du bouton
     });
