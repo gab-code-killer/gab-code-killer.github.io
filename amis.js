@@ -103,27 +103,32 @@ function rechercherJoueur() {
     return;
   }
   
-  if (pseudoRecherche === donneesUtilisateur.pseudo) {
+  if (pseudoRecherche.toLowerCase() === donneesUtilisateur.pseudo.toLowerCase()) {
     afficherNotification("❌ Vous ne pouvez pas vous ajouter vous-même !", 'error');
     return;
   }
   
   resultatRecherche.innerHTML = '<p style="color: white;">🔍 Recherche en cours...</p>';
   
-  // Rechercher dans Firebase
-  db.collection('users')
-    .where('pseudo', '==', pseudoRecherche)
-    .get()
+  // Rechercher dans Firebase (ignorer majuscules/minuscules)
+  db.collection('users').get()
     .then((querySnapshot) => {
-      if (querySnapshot.empty) {
+      let joueurTrouve = null;
+      let joueurUid = null;
+      
+      // Chercher en comparant en minuscules
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.pseudo && data.pseudo.toLowerCase() === pseudoRecherche.toLowerCase()) {
+          joueurTrouve = data;
+          joueurUid = doc.id;
+        }
+      });
+      
+      if (!joueurTrouve) {
         resultatRecherche.innerHTML = '<p class="message-erreur">❌ Aucun joueur trouvé avec ce pseudo</p>';
       } else {
-        // Joueur trouvé
-        const joueurDoc = querySnapshot.docs[0];
-        const joueur = joueurDoc.data();
-        const joueurUid = joueurDoc.id;
-        
-        afficherResultatRecherche(joueur, joueurUid);
+        afficherResultatRecherche(joueurTrouve, joueurUid);
       }
     })
     .catch((error) => {
