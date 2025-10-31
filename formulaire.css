@@ -42,3 +42,41 @@ form {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
+
+/* === RESPONSIVE - VERSION MOBILE === */
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: 1.8em;
+        margin-top: 20px;
+    }
+
+    form {
+        margin-top: 50px;
+        padding: 0 20px;
+    }
+
+    .pseudo,
+    .email,
+    .mot_de_passe {
+        width: 90%;
+        max-width: 300px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .soumettre {
+        height: 40px;
+        font-size: 16px;
+        padding: 0 20px;
+    }
+
+    .champ {
+        margin-bottom: 25px;
+    }
+
+    .p_pseudo,
+    .p_email,
+    .p_mot_de_passe {
+        font-size: 13px;
+    }
+}

@@ -109,3 +109,50 @@ h2 {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
+
+/* === RESPONSIVE - VERSION MOBILE === */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    .amelioration-container {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .amelioration-item {
+        padding: 15px;
+    }
+
+    .amelioration-item h3 {
+        font-size: 1.4em;
+    }
+
+    .amelioration-item p {
+        font-size: 0.95em;
+    }
+
+    .prix {
+        font-size: 1.2em !important;
+    }
+
+    .bouton-achat {
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+
+    .retour {
+        padding: 12px 20px;
+        font-size: 1em;
+        margin-top: 20px;
+    }
+}

@@ -217,3 +217,80 @@ h3 {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
+
+/* === RESPONSIVE - VERSION MOBILE === */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.1em;
+    }
+
+    .section-recherche,
+    .section-demandes,
+    .section-demandes-envoyees,
+    .section-amis {
+        max-width: 100%;
+        padding: 15px;
+        margin: 15px auto;
+    }
+
+    .barre-recherche {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .input-recherche {
+        width: 100%;
+        max-width: none;
+    }
+
+    .btn-rechercher {
+        width: 100%;
+        padding: 12px 20px;
+    }
+
+    .carte-joueur {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .info-joueur {
+        text-align: center;
+        width: 100%;
+    }
+
+    .actions-joueur {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .btn-ajouter,
+    .btn-accepter,
+    .btn-refuser,
+    .btn-supprimer,
+    .btn-annuler {
+        width: 100%;
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+
+    .retour {
+        padding: 12px 20px;
+        font-size: 1em;
+        margin-top: 20px;
+    }
+}
+

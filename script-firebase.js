@@ -385,22 +385,34 @@ function mettreAJourScoreClassement(nouveauScore) {
 }
 
 function afficherClassement() {
-  // Récupérer les joueurs réels ET fictifs depuis Firebase
+  // Récupérer les joueurs réels, fictifs ET la liste d'amis depuis Firebase
   Promise.all([
     db.collection('users').orderBy('score', 'desc').get(),
-    db.collection('joueurs_fictifs').orderBy('score', 'desc').get()
+    db.collection('joueurs_fictifs').orderBy('score', 'desc').get(),
+    utilisateurActuel ? db.collection('users').doc(utilisateurActuel.uid).collection('amis').get() : Promise.resolve({ empty: true, docs: [] })
   ])
-    .then(([joueursReelsSnapshot, joueursFictifsSnapshot]) => {
+    .then(([joueursReelsSnapshot, joueursFictifsSnapshot, amisSnapshot]) => {
       const joueursReels = [];
       const joueursFictifs = [];
+      const listeAmisUIDs = new Set();
       
-      // Récupérer les joueurs réels
+      // Récupérer les UIDs des amis
+      if (!amisSnapshot.empty) {
+        amisSnapshot.forEach((doc) => {
+          listeAmisUIDs.add(doc.id);
+        });
+      }
+      
+      // Récupérer les joueurs réels avec leur UID
       joueursReelsSnapshot.forEach((doc) => {
         const data = doc.data();
+        const uid = doc.id;
         joueursReels.push({
           pseudo: data.pseudo,
           score: data.score || 0,
-          reel: true
+          reel: true,
+          uid: uid,
+          estAmi: listeAmisUIDs.has(uid)
         });
       });
       
@@ -472,7 +484,14 @@ function afficherClassement() {
       for (let i = 0; i < Math.min(5, tousLesJoueurs.length); i++) {
         const joueur = tousLesJoueurs[i];
         const rang = document.createElement("p");
-        rang.textContent = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
+        let texte = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
+        
+        // Ajouter l'indicateur d'ami
+        if (joueur.estAmi) {
+          texte += " 👥";
+        }
+        
+        rang.textContent = texte;
         rang.style.margin = "2px 0";
         rang.style.padding = "3px";
         rang.style.fontSize = "14px";
@@ -617,7 +636,14 @@ function afficherClassementComplet(tousLesJoueurs) {
   for (let i = 0; i < nombreAffiche; i++) {
     const joueur = tousLesJoueurs[i];
     const rang = document.createElement("p");
-    rang.textContent = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
+    let texte = `${i + 1}. ${joueur.pseudo} - ${joueur.score} points`;
+    
+    // Ajouter l'indicateur d'ami
+    if (joueur.estAmi) {
+      texte += " 👥";
+    }
+    
+    rang.textContent = texte;
     rang.style.margin = "3px 0";
     rang.style.padding = "5px";
     rang.style.fontSize = "13px";
