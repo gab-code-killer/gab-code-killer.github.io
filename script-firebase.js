@@ -60,6 +60,14 @@ function initialiserElementsDOM() {
     });
   }
 
+  // Bouton amis
+  const boutonAmis = document.getElementById("boutonAmis");
+  if (boutonAmis) {
+    boutonAmis.addEventListener("click", function () {
+      window.location.href = "amis.html";
+    });
+  }
+
   // Bouton quitter avec ta popup
   const boutonQuitter = document.getElementById("boutonQuitter");
   if (boutonQuitter) {
@@ -161,6 +169,9 @@ auth.onAuthStateChanged((user) => {
           if (!jeuInitialise) {
             afficherContenu();
             jeuInitialise = true; // Marquer comme initialisé
+            
+            // 🎮 Démarrer la progression des joueurs fictifs
+            demarrerProgressionFictifs();
           }
         }
       });
@@ -171,55 +182,192 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-// Générer les joueurs fictifs une seule fois
-const joueursFictifs = genererJoueursFictifs();
+// Fonction pour initialiser les joueurs fictifs dans Firebase (une seule fois)
+async function initialiserJoueursFictifs() {
+  try {
+    // Vérifier si les joueurs fictifs existent déjà
+    const snapshot = await db.collection('joueurs_fictifs').limit(1).get();
+    
+    if (!snapshot.empty) {
+      console.log("✅ Les joueurs fictifs existent déjà dans Firebase");
+      return;
+    }
 
-function genererJoueursFictifs() {
-  const prenoms = ["Alex", "Jordan", "Casey", "Morgan", "Taylor", "Riley", "Avery", "Quinn", "Sage", "River", "Blake", "Reese", "Skyler", "Emery", "Finley", "Rowan", "Parker", "Hayden", "Cameron", "Drew", "Sam", "Jamie", "Charlie", "Devon", "Frankie", "Jesse", "Kendall", "Logan", "Micah", "Noel", "Oakley", "Phoenix", "Remy", "Shay", "Tate", "Val", "Winter", "Zion", "Angel", "Bay", "Cedar", "Dallas", "Ember", "Gray", "Harbor", "Indigo", "Jade", "Nova", "Storm", "Kai", "Ash", "Luna", "Max", "Neo", "Zara", "Axel", "Mia", "Leo", "Ivy", "Rex", "Sky", "Fox", "Eve", "Jax", "Aria", "Orion", "Ruby", "Zane", "Iris", "Ace", "Luna", "Knox", "Nyx", "Cruz", "Sage", "Blaze", "Rain", "Dex", "Star", "Jet", "Moon", "Vex", "Snow", "Rex", "Sage", "Bolt", "Faye", "Dash", "Wren", "Rush", "Belle", "Flux", "Rose", "Hawk", "Dawn", "Lynx", "Hope", "Vibe", "Joy", "Edge", "Grace"];
-  const suffixes = ["2024", "Pro", "Gaming", "XL", "99", "Master", "King", "Boss", "Elite", "Legend", "Gamer", "Ninja", "Shadow", "Fire", "Storm", "Blade", "Wolf", "Dragon", "Phoenix", "Thunder", "Ace", "Cyber", "Nova", "Vortex", "Pixel", "Quantum", "Neon", "Turbo", "Alpha", "Beta", "Omega", "Zero", "Prime", "Ultra", "Mega", "Super", "Hyper", "Titan", "Flash", "Spark", "Void", "Frost", "Solar", "Lunar", "Comet", "Stellar", "Cosmic", "Atomic", "Digital", "Matrix", "Cyber", "Virtual", "Binary", "Code", "Tech", "Data", "System", "Network", "Server", "Cloud", "Stream", "Signal", "Pulse", "Wave", "Flux", "Core", "Node", "Link", "Sync", "Boost", "Surge", "Rush", "Blitz", "Dash", "Swift", "Speed", "Quick", "Fast", "Rapid", "Turbo", "Nitro", "Rocket", "Jet", "Zoom", "Flash", "Bolt", "Strike", "Impact", "Crush", "Smash", "Blast", "Boom", "Bang", "Pow", "Zap", "Shock", "Volt", "Amp", "Watt", "Power", "Energy", "Force", "Might", "Strength"];
-  
-  const joueursFictifs = [];
-  
-  // Générer entre 10 000 et 1 000 000 joueurs fictifs (ÉNORME DÉFI !)
-  const nombreJoueurs = Math.floor(Math.random() * 990001) + 10000; // Entre 10 000 et 1 000 000
-  console.log(`🎮 Génération de ${nombreJoueurs.toLocaleString('fr-FR')} joueurs fictifs...`);
-  
-  // Optimisation : génération par batch pour éviter de bloquer l'interface
-  for (let i = 0; i < nombreJoueurs; i++) {
-    // Afficher un message de progression tous les 50 000 joueurs
-    if (i % 50000 === 0 && i > 0) {
-      console.log(`⏳ Progression: ${Math.round((i/nombreJoueurs)*100)}% (${i.toLocaleString('fr-FR')}/${nombreJoueurs.toLocaleString('fr-FR')})`);
-    }
-    const prenom = prenoms[Math.floor(Math.random() * prenoms.length)];
-    const suffixe = suffixes[Math.floor(Math.random() * suffixes.length)];
-    const numero = Math.floor(Math.random() * 9999) + 1;
-    const pseudo = prenom + suffixe + numero;
+    console.log("🔄 Création des joueurs fictifs dans Firebase...");
+
+    const prenoms = ["Alex", "Jordan", "Casey", "Morgan", "Taylor", "Riley", "Avery", "Quinn", "Sage", "River", "Blake", "Reese", "Skyler", "Emery", "Finley", "Rowan", "Parker", "Hayden", "Cameron", "Drew", "Sam", "Jamie", "Charlie", "Devon", "Frankie", "Jesse", "Kendall", "Logan", "Micah", "Noel", "Oakley", "Phoenix", "Remy", "Shay", "Tate", "Val", "Winter", "Zion", "Angel", "Bay", "Cedar", "Dallas", "Ember", "Gray", "Harbor", "Indigo", "Jade", "Nova", "Storm", "Kai", "Ash", "Luna", "Max", "Neo", "Zara", "Axel", "Mia", "Leo", "Ivy", "Rex", "Sky", "Fox", "Eve", "Jax", "Aria", "Orion", "Ruby", "Zane", "Iris", "Ace", "Luna", "Knox", "Nyx", "Cruz", "Sage", "Blaze", "Rain", "Dex", "Star", "Jet", "Moon", "Vex", "Snow", "Rex", "Sage", "Bolt", "Faye", "Dash", "Wren", "Rush", "Belle", "Flux", "Rose", "Hawk", "Dawn", "Lynx", "Hope", "Vibe", "Joy", "Edge", "Grace"];
+    const suffixes = ["2024", "Pro", "Gaming", "XL", "99", "Master", "King", "Boss", "Elite", "Legend", "Gamer", "Ninja", "Shadow", "Fire", "Storm", "Blade", "Wolf", "Dragon", "Phoenix", "Thunder", "Ace", "Cyber", "Nova", "Vortex", "Pixel", "Quantum", "Neon", "Turbo", "Alpha", "Beta", "Omega", "Zero", "Prime", "Ultra", "Mega", "Super", "Hyper", "Titan", "Flash", "Spark", "Void", "Frost", "Solar", "Lunar", "Comet", "Stellar", "Cosmic", "Atomic", "Digital", "Matrix", "Cyber", "Virtual", "Binary", "Code", "Tech", "Data", "System", "Network", "Server", "Cloud", "Stream", "Signal", "Pulse", "Wave", "Flux", "Core", "Node", "Link", "Sync", "Boost", "Surge", "Rush", "Blitz", "Dash", "Swift", "Speed", "Quick", "Fast", "Rapid", "Turbo", "Nitro", "Rocket", "Jet", "Zoom", "Flash", "Bolt", "Strike", "Impact", "Crush", "Smash", "Blast", "Boom", "Bang", "Pow", "Zap", "Shock", "Volt", "Amp", "Watt", "Power", "Energy", "Force", "Might", "Strength"];
     
-    // Répartition réaliste des scores pour un gros serveur
-    let score;
-    const random = Math.random();
-    if (random < 0.5) {
-      // 50% ont un score entre 0 et 100 (les débutants/casual)
-      score = Math.floor(Math.random() * 101);
-    } else if (random < 0.75) {
-      // 25% ont un score entre 101 et 1000 (joueurs réguliers)
-      score = Math.floor(Math.random() * 900) + 101;
-    } else if (random < 0.9) {
-      // 15% ont un score entre 1001 et 10000 (joueurs expérimentés)
-      score = Math.floor(Math.random() * 9000) + 1001;
-    } else if (random < 0.98) {
-      // 8% ont un score entre 10001 et 100000 (pros)
-      score = Math.floor(Math.random() * 90000) + 10001;
-    } else {
-      // 2% ont un score entre 100001 et 1000000 (les légendes !)
-      score = Math.floor(Math.random() * 900000) + 100001;
+    // Créer 500 joueurs fictifs (optimisé pour Firebase)
+    const nombreJoueurs = 500;
+    const batch = db.batch();
+    
+    for (let i = 0; i < nombreJoueurs; i++) {
+      const prenom = prenoms[Math.floor(Math.random() * prenoms.length)];
+      const suffixe = suffixes[Math.floor(Math.random() * suffixes.length)];
+      const numero = Math.floor(Math.random() * 9999) + 1;
+      const pseudo = prenom + suffixe + numero;
+      
+      // Score entre 0 et 50000 pour commencer (sera ajusté selon le max des vrais joueurs)
+      let score;
+      const random = Math.random();
+      if (random < 0.5) {
+        score = Math.floor(Math.random() * 101); // 50% entre 0-100
+      } else if (random < 0.75) {
+        score = Math.floor(Math.random() * 900) + 101; // 25% entre 101-1000
+      } else if (random < 0.9) {
+        score = Math.floor(Math.random() * 9000) + 1001; // 15% entre 1001-10000
+      } else {
+        score = Math.floor(Math.random() * 40000) + 10001; // 10% entre 10001-50000
+      }
+      
+      const docRef = db.collection('joueurs_fictifs').doc();
+      batch.set(docRef, {
+        pseudo: pseudo,
+        score: score,
+        fictif: true,
+        dateCreation: new Date()
+      });
     }
     
-    joueursFictifs.push({ pseudo: pseudo, score: score });
+    await batch.commit();
+    console.log(`✅ ${nombreJoueurs} joueurs fictifs créés dans Firebase !`);
+  } catch (error) {
+    console.error("❌ Erreur création joueurs fictifs:", error);
   }
+}
+
+// Initialiser les joueurs fictifs au chargement
+initialiserJoueursFictifs();
+
+// Fonction pour calculer les points gagnés selon le niveau du joueur (plus réaliste)
+function calculerPointsGagnes(scoreActuel) {
+  if (scoreActuel < 100) {
+    // Débutants : +1 à +5 points
+    return Math.floor(Math.random() * 5) + 1;
+  } else if (scoreActuel < 1000) {
+    // Joueurs réguliers : +5 à +20 points
+    return Math.floor(Math.random() * 16) + 5;
+  } else if (scoreActuel < 10000) {
+    // Expérimentés : +10 à +50 points
+    return Math.floor(Math.random() * 41) + 10;
+  } else {
+    // Pros : +20 à +100 points
+    return Math.floor(Math.random() * 81) + 20;
+  }
+}
+
+// Fonction pour calculer le taux d'activité selon l'heure (plus réaliste)
+function calculerTauxActivite() {
+  const maintenant = new Date();
+  const heure = maintenant.getHours();
   
-  console.log(`✅ Génération terminée ! ${nombreJoueurs.toLocaleString('fr-FR')} joueurs créés.`);
-  return joueursFictifs;
+  // Nuit (23h-8h) : Très peu de joueurs actifs (5-10%)
+  if (heure >= 23 || heure < 8) {
+    return 0.05 + (Math.random() * 0.05); // Entre 5% et 10%
+  }
+  // Heures de pointe (18h-22h) : Beaucoup de joueurs actifs (70-90%)
+  else if (heure >= 18 && heure < 23) {
+    return 0.70 + (Math.random() * 0.20); // Entre 70% et 90%
+  }
+  // Midi-après-midi (12h-18h) : Activité moyenne (40-60%)
+  else if (heure >= 12 && heure < 18) {
+    return 0.40 + (Math.random() * 0.20); // Entre 40% et 60%
+  }
+  // Matinée (8h-12h) : Activité faible-moyenne (20-40%)
+  else {
+    return 0.20 + (Math.random() * 0.20); // Entre 20% et 40%
+  }
+}
+
+// Fonction pour faire progresser les joueurs fictifs de manière réaliste
+async function faireProgresserJoueursFictifs() {
+  try {
+    const maintenant = new Date();
+    const heure = maintenant.getHours();
+    
+    // Message selon l'heure
+    let periode = "";
+    if (heure >= 23 || heure < 8) {
+      periode = "🌙 Nuit - Peu de joueurs actifs";
+    } else if (heure >= 18 && heure < 23) {
+      periode = "🔥 Heures de pointe - Beaucoup de joueurs !";
+    } else if (heure >= 12 && heure < 18) {
+      periode = "☀️ Après-midi - Activité normale";
+    } else {
+      periode = "🌅 Matinée - Activité modérée";
+    }
+    
+    console.log(`⏰ ${heure}h - ${periode}`);
+    
+    // Récupérer tous les joueurs fictifs
+    const snapshot = await db.collection('joueurs_fictifs').get();
+    
+    if (snapshot.empty) {
+      console.log("⚠️ Aucun joueur fictif trouvé");
+      return;
+    }
+
+    const batch = db.batch();
+    let compteur = 0;
+    let joueursActifs = 0;
+    
+    // Calculer le taux d'activité selon l'heure
+    const tauxActivite = calculerTauxActivite();
+
+    snapshot.forEach((doc) => {
+      // Chance d'être actif selon l'heure de la journée
+      const estActif = Math.random() < tauxActivite;
+      
+      if (estActif) {
+        const data = doc.data();
+        const scoreActuel = data.score || 0;
+        const pointsGagnes = calculerPointsGagnes(scoreActuel);
+        const nouveauScore = scoreActuel + pointsGagnes;
+        
+        batch.update(doc.ref, { score: nouveauScore });
+        joueursActifs++;
+        compteur++;
+        
+        // Firebase limite à 500 opérations par batch
+        if (compteur === 500) {
+          batch.commit();
+          compteur = 0;
+        }
+      }
+    });
+
+    // Commit les dernières mises à jour
+    if (compteur > 0) {
+      await batch.commit();
+    }
+
+    const pourcentageActifs = ((joueursActifs / snapshot.size) * 100).toFixed(1);
+    console.log(`📈 ${joueursActifs}/${snapshot.size} joueurs fictifs ont progressé (${pourcentageActifs}% actifs)`);
+    
+    // Rafraîchir le classement pour montrer les changements
+    if (typeof afficherClassement === 'function') {
+      afficherClassement();
+    }
+  } catch (error) {
+    console.error("❌ Erreur progression fictifs:", error);
+  }
+}
+
+// Démarrer la progression automatique des joueurs fictifs
+function demarrerProgressionFictifs() {
+  // Première mise à jour après 30 secondes
+  setTimeout(() => {
+    faireProgresserJoueursFictifs();
+    
+    // Puis toutes les 1 à 2 minutes (aléatoire pour plus de réalisme)
+    setInterval(() => {
+      const delai = (Math.random() * 60000) + 60000; // Entre 1 et 2 minutes
+      setTimeout(faireProgresserJoueursFictifs, delai);
+    }, 90000); // Vérifier toutes les 1.5 minutes en moyenne
+  }, 30000);
+  
+  console.log("🎮 Système de progression des joueurs fictifs activé !");
 }
 
 // Fonction légère pour mettre à jour seulement le score du joueur connecté
@@ -237,17 +385,45 @@ function mettreAJourScoreClassement(nouveauScore) {
 }
 
 function afficherClassement() {
-  // Récupérer tous les joueurs depuis Firebase
-  db.collection('users').orderBy('score', 'desc').get()
-    .then((querySnapshot) => {
+  // Récupérer les joueurs réels ET fictifs depuis Firebase
+  Promise.all([
+    db.collection('users').orderBy('score', 'desc').get(),
+    db.collection('joueurs_fictifs').orderBy('score', 'desc').get()
+  ])
+    .then(([joueursReelsSnapshot, joueursFictifsSnapshot]) => {
       const joueursReels = [];
-      querySnapshot.forEach((doc) => {
+      const joueursFictifs = [];
+      
+      // Récupérer les joueurs réels
+      joueursReelsSnapshot.forEach((doc) => {
         const data = doc.data();
         joueursReels.push({
           pseudo: data.pseudo,
-          score: data.score || 0
+          score: data.score || 0,
+          reel: true
         });
       });
+      
+      // Récupérer les joueurs fictifs
+      joueursFictifsSnapshot.forEach((doc) => {
+        const data = doc.data();
+        joueursFictifs.push({
+          pseudo: data.pseudo,
+          score: data.score || 0,
+          fictif: true
+        });
+      });
+      
+      // 🔥 NOUVEAU: Ajuster les scores fictifs pour qu'ils restent sous le max des vrais joueurs
+      const scoreMaxReel = joueursReels.length > 0 ? Math.max(...joueursReels.map(j => j.score)) : 0;
+      
+      // Filtrer et ajuster les joueurs fictifs
+      const joueursFictifsAjustes = joueursFictifs.filter(j => {
+        // Garder seulement les joueurs fictifs avec un score inférieur au max réel
+        return j.score <= scoreMaxReel;
+      });
+      
+      console.log(`📊 Scores: Max réel = ${scoreMaxReel}, Fictifs gardés = ${joueursFictifsAjustes.length}/${joueursFictifs.length}`);
       
       // 🔥 NOUVEAU: Remplacer le score du joueur connecté par son score local
       if (donneesUtilisateur) {
@@ -261,8 +437,8 @@ function afficherClassement() {
         }
       }
       
-      // Combiner joueurs réels et fictifs
-      const tousLesJoueurs = [...joueursFictifs, ...joueursReels];
+      // Combiner joueurs réels et fictifs ajustés
+      const tousLesJoueurs = [...joueursFictifsAjustes, ...joueursReels];
       tousLesJoueurs.sort((a, b) => b.score - a.score);
       
       // Formater le nombre de joueurs pour l'affichage

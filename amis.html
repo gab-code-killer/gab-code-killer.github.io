@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amis</title>
+    <link rel="stylesheet" href="amis.css" />
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  </head>
+  <body>
+    <h1>👥 Amis</h1>
+    <h2 id="pseudoAffiche">Bienvenue !</h2>
+
+    <!-- Section Recherche -->
+    <div class="section-recherche">
+      <h3>🔍 Rechercher un joueur</h3>
+      <div class="barre-recherche">
+        <input 
+          id="inputRecherche" 
+          type="text" 
+          placeholder="Entrer un pseudo..."
+          class="input-recherche"
+        />
+        <button id="boutonRechercher" class="btn-rechercher">Rechercher</button>
+      </div>
+      <div id="resultatRecherche" class="resultat-recherche"></div>
+    </div>
+
+    <!-- Section Demandes en attente -->
+    <div class="section-demandes">
+      <h3>📨 Demandes d'amis reçues</h3>
+      <div id="listeDemandesRecues" class="liste-demandes">
+        <p class="message-vide">Aucune demande en attente</p>
+      </div>
+    </div>
+
+    <!-- Section Demandes envoyées -->
+    <div class="section-demandes-envoyees">
+      <h3>📤 Demandes envoyées</h3>
+      <div id="listeDemandesEnvoyees" class="liste-demandes">
+        <p class="message-vide">Aucune demande envoyée</p>
+      </div>
+    </div>
+
+    <!-- Section Liste d'amis -->
+    <div class="section-amis">
+      <h3>✅ Liste d'amis</h3>
+      <div id="listeAmis" class="liste-amis">
+        <p class="message-vide">Vous n'avez pas encore d'amis</p>
+      </div>
+    </div>
+
+    <button id="retourJeu" class="retour">Retour au Jeu</button>
+
+    <script src="firebase-config.js"></script>
+    <script src="amis.js"></script>
+  </body>
+</html>
